@@ -69,6 +69,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Db\DbTester.cs" />
     <Compile Include="File\FileTester.cs" />
     <Compile Include="Print\FrmPrintTest.cs">
       <SubType>Form</SubType>

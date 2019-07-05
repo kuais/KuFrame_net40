@@ -15,11 +15,11 @@ namespace Ku.io
 
         #region Properties
         public long ID { get; private set; }
-        public bool IsStarted { get => socket.IsBound; }
+        public bool IsStarted => socket == null ? false : socket.IsBound;
         public string LocalAddress { get => socket.LocalEndPoint.ToString(); }
         public int ListenLimit { get; set; }                        //排队Accept的连接上限
         public int ConnectionCount { get => DictConnection.Count; }
-        public IServerListener Listener { get; set; }
+        public IConnectionListener Listener { get; set; }
         public Dictionary<string, KuSocketConnection> DictConnection { get; } = new Dictionary<string, KuSocketConnection>();           //RemoteAddress - Connection
         
         public Socket Socket
@@ -37,12 +37,10 @@ namespace Ku.io
         {
             this.InitConnectionPool(maxConnectionCount, connectionBufferSize);
             this.ListenLimit = 1000;
-            argsAccept = new SocketAsyncEventArgs();
-            argsAccept.Completed += ArgsAccept_Completed;
             ID = _id++;
         }
 
-        public bool Start(string ip, int port)
+        public void Start(string ip, int port)
         {
             this.Stop();
             if (socket == null)
@@ -52,47 +50,60 @@ namespace Ku.io
                 IPEndPoint endPoint = new IPEndPoint(IPAddress.Parse(ip), port);
                 socket.Bind(endPoint);
                 socket.Listen(ListenLimit);
+                argsAccept = new SocketAsyncEventArgs();
+                argsAccept.Completed += ArgsAccept_Completed;
                 this.Accept();
-                if (Listener != null)
-                    Listener.OnStarted(this);
-                return true;
             }
-            catch (Exception ex)
+            catch
             {
                 this.Stop();
-                if (Listener != null)
-                    Listener.OnError(ex);
-                return false;
+                throw;
             }
         }
 
         public void Stop()
         {
             if (socket == null) return;
+            if (argsAccept != null)
+            {
+                argsAccept.Completed -= ArgsAccept_Completed;
+                argsAccept = null;
+            }
             socket.Close();
             socket = null;
             //关闭所有连接
             string[] addrList = new string[DictConnection.Count];
             DictConnection.Keys.CopyTo(addrList, 0);
-            foreach (string addr in addrList)
+            try
             {
-                if (DictConnection.ContainsKey(addr))
-                    DictConnection[addr].Disconnect();
+                foreach (string addr in addrList)
+                {
+                    if (DictConnection.ContainsKey(addr))
+                        DictConnection[addr].Close();
+                    //DictConnection[addr].Disconnect();
+                }
             }
-            if (Listener != null) Listener.OnStopped(this);
+            catch (Exception ex)
+            {
+            }
         }
 
         private void Accept()
         {
+            if (socket == null) return;                                                 //监听Socket未初始化
             if (this.connnectionPool.Count == 0) return;                                //连接池已空,不再接受新连接
+            if (!socket.AcceptAsync(argsAccept))
+                ProcessAccepted(argsAccept);
+        }
+        private void TryAccept()
+        {
             try
             {
-                if (!socket.AcceptAsync(argsAccept))
-                    ProcessAccepted(argsAccept);
+                Accept();                                      //继续接受新连接
             }
             catch (Exception ex)
             {
-                if (Listener != null) Listener.OnError(ex);
+                Listener?.OnError(ex);
             }
         }
 
@@ -132,11 +143,11 @@ namespace Ku.io
                 }
                 conn.Socket = e.AcceptSocket;
                 conn.Server = this;
-                if (Listener != null) Listener.OnAccepted(conn);
-                conn.Connected();
+                conn.Listener = Listener;
+                conn.OnConnected();
             }
             e.AcceptSocket = null;
-            this.Accept();                                      //继续接受新连接
+            TryAccept();
         }
 
         private void InitConnectionPool(int maxConnectionCount, int connectionBufferSize)
@@ -165,7 +176,7 @@ namespace Ku.io
                 this.connnectionPool.Push(conn);
             }
             if (this.connnectionPool.Count == 1)       //从0->1，重新启动监听
-                this.Accept();
+                TryAccept();
         }
         internal void AddConnection(KuSocketConnection conn)
         {

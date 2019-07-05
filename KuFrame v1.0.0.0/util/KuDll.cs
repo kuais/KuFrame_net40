@@ -14,15 +14,22 @@ namespace Ku.util
         Type _type;                                   //要调用的类的类型
         #endregion
 
+        #region 属性
+        public Assembly CurrentAssembly { get => _assembly; }
+        public Type CurrentClass { get => _type; }
+        public object CurrentInstance { get => _object; }
+        #endregion
+
         public KuDll(){}
 
         /// <summary>
         /// 加载dll文件
         /// </summary>
         /// <param name="path">dll文件路径</param>
-        public void Load(string path)
+        public KuDll Load(string path)
         {
             _assembly = Assembly.LoadFrom(path) ?? throw new KuDllException(DLLError.AssemblyInvalid);
+            return this;
         }
 
         /// <summary>
@@ -30,11 +37,12 @@ namespace Ku.util
         /// </summary>
         /// <param name="className">类名,含命名空间</param>
         /// <returns>实例化的类对象</returns>
-        public Type GetClass(string className)
+        public KuDll GetClass(string className)
         {
             if (_assembly == null) throw new KuDllException(DLLError.AssemblyInvalid);
             //获取该类的类型     
-            return _type = _assembly.GetType(className) ?? throw new KuDllException(DLLError.ClassNotFound);
+            _type = _assembly.GetType(className) ?? throw new KuDllException(DLLError.ClassNotFound);
+            return this;
         }
 
         /// <summary>

@@ -12,32 +12,38 @@ namespace Ku.file
         public XmlDocument Doc { get; private set; }
         #endregion
 
-        public KuXML()
+        public KuXML(string path = "")
         {
-            Doc = new XmlDocument();
-            XmlNode Xnode = Doc.CreateXmlDeclaration("1.0", "UTF-8", null);
-            Doc.AppendChild(Xnode);
+            Load(path);
         }
         public void Load(string path)
         {
             Path = path;
-            Doc.Load(Path);
+            Doc = new XmlDocument();
+            if (string.IsNullOrEmpty(path))
+                Init();
+            else
+                Doc.Load(Path);
         }
-
         public void Save(string path = "")
         {
             if (string.IsNullOrEmpty(path)) path = Path;
             Doc.Save(path);
+        }
+        public void Init()
+        {
+            Doc.AppendChild(Doc.CreateXmlDeclaration("1.0", "UTF-8", null));
         }
         /// <summary>
         /// 获取指定名称的第一个节点
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public XmlElement GetElement(string name = "")
+        public XmlElement GetElement(string name = "", bool find = false)
         {
             if (string.IsNullOrEmpty(name)) return Doc.DocumentElement;
-            XmlNodeList list = Doc.GetElementsByTagName(name);
+            XmlNodeList list;
+            list = (find) ?  Doc.SelectNodes(name) : Doc.GetElementsByTagName(name);
             return (list.Count <= 0) ? null : (XmlElement)list[0];
         }
         /// <summary>
@@ -46,10 +52,11 @@ namespace Ku.file
         /// <param name="name">节点名称</param>
         /// <param name="parent">父节点</param>
         /// <returns></returns>
-        public XmlElement GetElement(string name, XmlElement parent)
+        public XmlElement GetElement(string name, XmlElement parent, bool find = false)
         {
             if (parent == null) return null;
-            XmlNodeList list = parent.GetElementsByTagName(name);
+            XmlNodeList list;
+            list = (find) ? parent.SelectNodes(name) : parent.GetElementsByTagName(name);
             return (list.Count <= 0) ? null : (XmlElement)list[0];
         }
         /// <summary>
@@ -58,12 +65,13 @@ namespace Ku.file
         /// <param name="name">子节点名称</param>
         /// <param name="parent">父节点</param>
         /// <returns></returns>
-        public List<XmlElement> GetElements(string name, XmlElement parent)
+        public List<XmlElement> GetElements(string name, XmlElement parent, bool find = false)
         {
             List<XmlElement> result = new List<XmlElement>();
             if (parent == null) return result;
             if (string.IsNullOrEmpty(name)) return result;
-            XmlNodeList list = parent.GetElementsByTagName(name);
+            XmlNodeList list;
+            list = (find) ? parent.SelectNodes(name) : parent.GetElementsByTagName(name);
             foreach (XmlNode node in list)
             {
                 if (node.NodeType == XmlNodeType.Element)

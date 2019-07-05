@@ -26,7 +26,7 @@ namespace Ku.db
                 case DbType.MsSql:
                     return new MsSqlDb(connectstring);
                 default:
-                    throw new System.Exception("Invalid");
+                    return null;
             }
         }
         #region 属性
@@ -39,6 +39,18 @@ namespace Ku.db
 
         #region 方法
         protected abstract DbConnection InitConnection();
+        public void DoAction(System.Action action)
+        {
+            try
+            {
+                Open();
+                action();
+            }
+            finally
+            {
+                Close();
+            }
+        }
         public void Open()
         {
             if (_conn == null)
@@ -146,9 +158,15 @@ namespace Ku.db
             _cmd.CommandText = sql;
             return _cmd.ExecuteNonQuery();
         }
+        public object ExecuteScalar(string sql)
+        {
+            _cmd.CommandType = CommandType.Text;
+            _cmd.CommandText = sql;
+            return _cmd.ExecuteScalar();
+        }
         public int ExecuteTransaction(List<string> sqlList)
         {
-            Transaction transaction = delegate
+            int transaction()
             {
                 int result = 0;
                 foreach (string sql in sqlList)
@@ -157,7 +175,7 @@ namespace Ku.db
                     result += _cmd.ExecuteNonQuery();
                 }
                 return result;
-            };
+            }
             return ExecuteTransaction(transaction);
         }
         public int ExecuteTransaction(Transaction d)

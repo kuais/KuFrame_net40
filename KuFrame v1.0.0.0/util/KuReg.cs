@@ -6,6 +6,12 @@ namespace Ku.util
 {
     public class KuReg
     {
+        public static readonly RegistryKey ClassesRoot = Registry.ClassesRoot;
+        public static readonly RegistryKey CurrentUser = Registry.CurrentUser;
+        public static readonly RegistryKey LocalMachine = Registry.LocalMachine;
+        public static readonly RegistryKey PerformanceData = Registry.PerformanceData;
+        public static readonly RegistryKey Users = Registry.Users;
+        
         /// <summary>
         /// 获取注册表键值
         /// </summary>

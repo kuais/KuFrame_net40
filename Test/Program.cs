@@ -18,28 +18,35 @@ namespace Test
             while(true)
             {
                 char c = Console.ReadKey(true).KeyChar;
-                switch (c)
+                try
                 {
-                    case '0':
-                        return;
-                    case '1':
-                        new SerialTester().Start();
-                        break;
-                    case '2':
-                        new SocketTester().Start();
-                        break;
-                    case '4':
-                        new FileTester().Start();
-                        break;
-                    case '5':
-                        new UtilTester().Start();
-                        break;
-                    case '9':
-                        new PrintTester().Start();
-                        break;
-                    default:
-                        Console.WriteLine("You press key " + c);
-                        break;
+                    switch (c)
+                    {
+                        case '0':
+                            return;
+                        case '1':
+                            new SerialTester().Start();
+                            break;
+                        case '2':
+                            new SocketTester().Start();
+                            break;
+                        case '4':
+                            new FileTester().Start();
+                            break;
+                        case '5':
+                            new UtilTester().Start();
+                            break;
+                        case '9':
+                            new PrintTester().Start();
+                            break;
+                        default:
+                            Console.WriteLine("You press key " + c);
+                            break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
                 }
             }
         }

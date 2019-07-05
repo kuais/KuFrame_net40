@@ -5,31 +5,31 @@ namespace Ku
 {
     public class KuLog
     {
-        public string BasePath { get; set; }
+        public string BasePath { get; set; } = AppDomain.CurrentDomain.BaseDirectory;
         public KuLog(string basepath = "")
         {
-            BasePath = string.IsNullOrEmpty(basepath) ? AppDomain.CurrentDomain.BaseDirectory : basepath;
+            if (!string.IsNullOrEmpty(basepath)) BasePath = basepath;
         }
-        public void LogDebug(string content)
+        public void Debug(string content)
+        {
+            Log(content, "Debug");
+        }
+
+        public void Info(string content)
         {
             Log(content, "Info");
         }
 
-        public void LogInfo(string content)
-        {
-            Log(content, "Info");
-        }
-
-        public void LogError(string content)
+        public void Error(string content)
         {
             Log(content, "Error");
         }
 
-        public void LogError(Exception ex)
+        public void Error(Exception ex)
         {
             string text = string.Format("Message:{0}\r\nStackTrace:{1}"
                 , ex.Message, ex.StackTrace);
-            LogError(text);
+            Error(text);
         }
 
         public void Log(string content, string subject)

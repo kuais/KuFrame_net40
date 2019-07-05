@@ -34,18 +34,23 @@ namespace Ku.db
         public KuSqlBuilder Filter(string filter = "")
         {
             if (string.IsNullOrEmpty(filter))
-                _order = "";
+                _filter = "";
             else 
                 _filter += filter;
             return this;
         }
-        public KuSqlBuilder Page(int page, int pageSize)
-        {
-            page--;
-            _filter += string.Format(" AND RowNum >{0} AND RowNum <={1}"
-                , pageSize * page, pageSize * (page + 1));
-            return this;
-        }
+        //public KuSqlBuilder Page(int page, int pageSize)
+        //{
+        //    if ((page == 0) || (pageSize == 0))
+        //        _page = "";
+        //    else
+        //    {
+        //        page--;
+        //        _page = string.Format(" RowNum >{0} AND RowNum <={1}"
+        //            , pageSize * page, pageSize * (page + 1));
+        //    }
+        //    return this;
+        //}
         public KuSqlBuilder Order(string order = "")
         {
             if (string.IsNullOrEmpty(order))
@@ -56,7 +61,7 @@ namespace Ku.db
         }
         public string Select(string select = "*", bool distinct = false)
         {
-            if (string.IsNullOrEmpty(_from)) throw new Exception("Please set From first!");
+            if (string.IsNullOrEmpty(_from)) throw new Exception("Please call From first!");
             if (string.IsNullOrEmpty(select)) select = "*";
             string _distinct = (distinct) ? "DISTINCT " : "";
             Sql = string.Format("SELECT {0}{1}{2} FROM {3}",_distinct, _order, select, _from);
@@ -74,7 +79,7 @@ namespace Ku.db
             int i = 0;
             string[] arr = new string[fields.Count];
             foreach (string k in fields.Keys) arr[i++] = Raw(fields[k]);
-            Sql = string.Format("INSERT INTO {0}({1}) VALUES ({2})", _from, string.Join(',', fields.Keys), string.Join(',', arr));
+            Sql = string.Format("INSERT INTO {0}({1}) VALUES ({2})", _from, string.Join(",", fields.Keys), string.Join(",", arr));
             return Sql;
         }
         public string Update(IDictionary<string, object> fields)
@@ -82,17 +87,37 @@ namespace Ku.db
             int i = 0;
             string[] arr = new string[fields.Count];
             foreach (string k in fields.Keys) arr[i++] = string.Format("{0}={1}", k, Raw(fields[k]));
-            Sql = string.Format("UPDATE {0} SET {1}" , _from, string.Join(',', arr));
+            Sql = string.Format("UPDATE {0} SET {1}" , _from, string.Join(",", arr));
             if (!string.IsNullOrEmpty(_filter)) Sql += " WHERE 1=1" + _filter;
             return Sql;
         }
-
-        public static string Raw(object value)
+        /// <summary>
+        /// 须在Order和Select之后执行
+        /// </summary>
+        /// <param name="page">页码</param>
+        /// <param name="pageSize">单页记录数</param>
+        /// <returns>查询语句</returns>
+        public string Page(int page, int pageSize)
         {
-            if (value is null) return "NULL";
-            if (value is string) return "'" + value + "'" ;
-            if (value is DateTime) return "'" + ((DateTime)value).ToString("yyyy-MM-dd HH:mm:ss") + "'";
-            return value.ToString();
+            if (string.IsNullOrEmpty(_order)) throw new Exception("Please call Order Function first!");
+            if (string.IsNullOrEmpty(Sql)) throw new Exception("Please call Select Function first!");
+            if ((page <= 0) || (pageSize <= 0)) return Sql;
+            page--;
+            return string.Format("SELECT * FROM ({0}) PageT WHERE RowNum >{1} AND RowNum <={2}"
+                , Sql, pageSize * page, pageSize * (page + 1));
+        }
+
+        /// <summary>
+        /// 根据对象类型格式化SQL字符串
+        /// </summary>
+        /// <param name="input">输入参数</param>
+        /// <returns>格式化后的字符串</returns>
+        public static string Raw(object input)
+        {
+            if (input is null) return "NULL";
+            if (input is string) return "'" + input + "'" ;
+            if (input is DateTime) return "'" + ((DateTime)input).ToString("yyyy-MM-dd HH:mm:ss") + "'";
+            return input.ToString();
         }
     }
 }

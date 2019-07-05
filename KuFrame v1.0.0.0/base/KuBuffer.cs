@@ -4,21 +4,22 @@ namespace Ku
 {
     public class KuBuffer
     {
-        // 缓冲区数组
-        private byte[] _buffer;
-        // 当前指向位置
+        #region private
+        /* 当前指向位置 */
         private int _curPosition;
-        // 当前已保存数据数
+        /* 当前已保存数据数 */
         private int _dataCount;
+        #endregion
 
+        #region public
         /// <summary>
         /// 还未处理的数据数
         /// </summary>
-        public int DataCount { get { return _dataCount - _curPosition; } }
+        public int DataCount => _dataCount - _curPosition;
         /// <summary>
         /// 缓冲区大小
         /// </summary>
-        public int Size { get { return _buffer.Length; } set { Resize(value); }}
+        public int Size { get => Buffers.Length; set { Resize(value); } }
         /// <summary>
         /// 最后接收时间
         /// </summary>
@@ -26,19 +27,26 @@ namespace Ku
         /// <summary>
         /// 单帧数据接收超时时间
         /// </summary>
-        public int Timeout { get; private set; } = 200;
+        public int Timeout { get; set; } = 500;
+        /// <summary>
+        /// 数据缓冲区
+        /// </summary>
+        public byte[] Buffers { get; private set; }
+        #endregion
 
         public KuBuffer(int size = 1024)
         {
-            _buffer = new byte[size];
+            Buffers = new byte[size];
             _curPosition = 0;
             _dataCount = 0;
         }
         public void Resize(int size)
         {
-            byte[] temp = _buffer;
-            _buffer = new byte[size];
-            Buffer.BlockCopy(temp, 0, _buffer, 0, temp.Length);
+            if (size == Size) return;
+            byte[] temp = Buffers;
+            Buffers = new byte[size];
+            int count = (temp.Length > size) ? size : temp.Length;
+            Buffer.BlockCopy(temp, 0, Buffers, 0, count);
         }
         public void Put(byte[] newData)
         {
@@ -47,12 +55,12 @@ namespace Ku
             if ((length + _dataCount) > this.Size)
             {   //数据总数超过缓冲区，移除已处理的数据，重建缓冲区
                 _dataCount = DataCount;
-                Buffer.BlockCopy(_buffer, _curPosition, _buffer, 0, _dataCount);
+                Buffer.BlockCopy(Buffers, _curPosition, Buffers, 0, _dataCount);
                 _curPosition = 0;
                 if ((length + _dataCount) > Size)  //清除后依然超出缓冲区，增大缓冲区
                     Resize(length + _dataCount);
             }
-            Buffer.BlockCopy(newData, 0, _buffer, _dataCount, length);
+            Buffer.BlockCopy(newData, 0, Buffers, _dataCount, length);
             _dataCount += length;
         }
         /// <summary>
@@ -61,10 +69,10 @@ namespace Ku
         /// <param name="length">数据数</param>
         /// <param name="offset">偏移量</param>
         /// <returns>取出的数据</returns>
-        public byte[] Get(int length, int offset = 0)
+        public byte[] GetArray(int length, int offset = 0)
         {
             byte[] ret = new byte[length];
-            Buffer.BlockCopy(_buffer, _curPosition + offset, ret, 0, length);
+            Buffer.BlockCopy(Buffers, _curPosition + offset, ret, 0, length);
             return ret;
         }
         /// <summary>
@@ -74,12 +82,13 @@ namespace Ku
         /// <returns>取出的值</returns>
         public byte Get(int offset = 0)
         {
-            return _buffer[_curPosition + offset];
+            return Buffers[_curPosition + offset];
         }
         /// <summary>
         /// 查找指定数据的位置，找不到返回-1
         /// </summary>
         /// <param name="value">要找的值</param>
+        /// <param name="offset">开始查找的位置</param>
         /// <returns>值所在的位置</returns>
         public int Find(byte value, int offset = 0)
         {

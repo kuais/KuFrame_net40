@@ -7,13 +7,8 @@ namespace Test
 {
     class SerialTester : IDataHandler
     {
+
         KuSerial serial = new KuSerial("COM3");
-        KuLog logger = new KuLog();
-        
-        public SerialTester()
-        {
-            serial.DataReceived += Serial_DataReceived;
-        }
 
         private void Serial_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
         {
@@ -24,16 +19,17 @@ namespace Test
 
         public void Start()
         {
+            serial.DataReceived += Serial_DataReceived;
             try
             {
                 serial.Open();
                 serial.Write("Hello");
                 Console.Out.WriteLine("Writed: Hello");
             }
-            catch (Exception ex)
+            catch
             {
                 serial.Close();
-                Console.Out.WriteLine(ex.Message);
+                throw;
             }
         }
 
@@ -46,7 +42,7 @@ namespace Test
                 buffer.Clear();
             else
             {
-                byte[] datas = buffer.Get(temp.Length, index);
+                byte[] datas = buffer.GetArray(temp.Length, index);
                 buffer.Remove(index + datas.Length);
                 serial.Write(datas);
                 Console.Out.WriteLine("Writed: " + string.Join(" ", KuConvert.HexFromDec(datas)));

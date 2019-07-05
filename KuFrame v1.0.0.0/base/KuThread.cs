@@ -10,6 +10,12 @@ namespace Ku
         public Action action;
         public int interval;
         public abstract void Start();
+        public virtual void Start(Action action, int interval = 0)
+        {
+            this.action = action;
+            this.interval = interval;
+            this.Start();
+        }
     }
     public class RunThread : KuThread
     {
@@ -27,7 +33,6 @@ namespace Ku
                 onStop?.Invoke();
             };
             new Thread(s).Start();
-            onStart?.Invoke();
         }
     }
 

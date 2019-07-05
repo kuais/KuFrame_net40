@@ -1,0 +1,1 @@
+使用Sqlite数据库时，需要将libs\x64\文件夹下的System.Data.SQLite.dll，SQLite.Interop.dll的文件拷到程序根目录

@@ -23,6 +23,12 @@ namespace Ku.util
                 sum += input[index++];
             return sum;
         }
+        public static byte GetSum(byte[] input, int index, int count)
+        {
+            int[] temp = new int[count];
+            Array.Copy(input, index, temp, 0, count);
+            return (byte)GetSum(temp, 0, count);
+        }
 
         public static int GetBit(byte input, int pos, int count = 1)
         {

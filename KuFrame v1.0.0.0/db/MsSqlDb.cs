@@ -5,7 +5,7 @@ namespace Ku.db
 {
     public class MsSqlDb : KuDb
     {
-        internal MsSqlDb(string connectstring) : base(connectstring) {}
+        public MsSqlDb(string connectstring) : base(connectstring) {}
 
         protected override DbConnection InitConnection()
         {
@@ -15,7 +15,7 @@ namespace Ku.db
         public int GetCurrentRowID(string table)
         {
             string sql = string.Format("SELECT ident_current('{0}');", table);
-            var e = Query(sql)[0].Values.GetEnumerator();
+            var e = Query(sql)[0].Values.GetEnumerator();               //可以用ExecuteScalar 简化
             e.MoveNext();
             return System.Convert.ToInt32(e.Current) + 1;
         }
