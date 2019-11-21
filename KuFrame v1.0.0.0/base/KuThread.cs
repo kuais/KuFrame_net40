@@ -10,6 +10,11 @@ namespace Ku
         public Action action;
         public int interval;
         public abstract void Start();
+        /// <summary>
+        /// 在新线程执行操作
+        /// </summary>
+        /// <param name="action">要执行的操作</param>
+        /// <param name="interval">延迟多少毫秒执行</param>
         public virtual void Start(Action action, int interval = 0)
         {
             this.action = action;
@@ -26,42 +31,40 @@ namespace Ku
 
         public override void Start()
         {
-            ThreadStart s = delegate {
+            new Thread(() =>
+            {
                 onStart?.Invoke();
                 Thread.Sleep(interval);
                 action?.Invoke();
                 onStop?.Invoke();
-            };
-            new Thread(s).Start();
+            }).Start();
         }
     }
 
     public class LoopThread : KuThread
     {
+        public bool Running { get; private set; } = false;
         public LoopThread()
         {
             interval = 1000;
         }
-
-        bool flagRun = false;
         public override void Start()
         {
-            ThreadStart s = delegate
+            Running = true;
+            new Thread(() =>
             {
                 onStart?.Invoke();
-                while (flagRun)
+                while (Running)
                 {
                     Thread.Sleep(interval);
                     action?.Invoke();
                 }
                 onStop?.Invoke();
-            };
-            flagRun = true;
-            new Thread(s).Start();
+            }).Start();
         }
         public void Stop()
         {
-            flagRun = false;
+            Running = false;
         }
     }
 }

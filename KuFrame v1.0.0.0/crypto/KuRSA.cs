@@ -5,7 +5,7 @@ namespace Ku.crypto
 {
     public class KuRSA : ICrypto
     {
-        private RSACryptoServiceProvider provider = new RSACryptoServiceProvider();
+        public RSACryptoServiceProvider provider = new RSACryptoServiceProvider();
         public bool UseOAEP { get; set; } = false;
 
         public KuRSA(string key)

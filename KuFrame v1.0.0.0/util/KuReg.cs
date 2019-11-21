@@ -67,6 +67,20 @@ namespace Ku.util
             {
                 Key[i + 1] = Key[i].CreateSubKey(strAddress[i]);
             }
+            Key[lenth].DeleteValue(KeyName);
+            Key[lenth].Close();
+        }
+
+        public static void DeleteKeyTree(RegistryKey Root, string RegAddress, string KeyName)
+        {
+            string[] strAddress = RegAddress.Split('\\');
+            int lenth = strAddress.Length;
+            RegistryKey[] Key = new RegistryKey[lenth + 1];
+            Key[0] = Root;
+            for (int i = 0; i < lenth; i++)
+            {
+                Key[i + 1] = Key[i].CreateSubKey(strAddress[i]);
+            }
             Key[lenth].DeleteSubKeyTree(KeyName);
             Key[lenth].Close();
         }
@@ -102,7 +116,7 @@ namespace Ku.util
         /// <param name="keyName">启动程序名称</param>
         public static void DelAutoRun(string keyName)
         {
-            string path = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
+            var path = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
             KuReg.Delete(Registry.LocalMachine, path, keyName);
         }
 

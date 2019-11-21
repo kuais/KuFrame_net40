@@ -10,35 +10,15 @@ namespace Ku
         {
             if (!string.IsNullOrEmpty(basepath)) BasePath = basepath;
         }
-        public void Debug(string content)
-        {
-            Log(content, "Debug");
-        }
-
-        public void Info(string content)
-        {
-            Log(content, "Info");
-        }
-
-        public void Error(string content)
-        {
-            Log(content, "Error");
-        }
-
-        public void Error(Exception ex)
-        {
-            string text = string.Format("Message:{0}\r\nStackTrace:{1}"
-                , ex.Message, ex.StackTrace);
-            Error(text);
-        }
-
+        public void Debug(string content) => Log(content, "Debug");
+        public void Info(string content) => Log(content, "Info");
+        public void Error(string content) => Log(content, "Error");
+        public void Error(Exception ex) => Error($"Message:{ex.Message}\r\nStackTrace:{ex.StackTrace}");
         public void Log(string content, string subject)
         {
-            string path = BasePath + Path.DirectorySeparatorChar + "Log" 
-                + Path.DirectorySeparatorChar + subject;
-            if (!Directory.Exists(path))
-                Directory.CreateDirectory(path);
-            path += Path.DirectorySeparatorChar + DateTime.Now.ToString("yyyyMMdd") + ".log";
+            var path = Path.Combine(BasePath, "Log", subject);
+            if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+            path = Path.Combine(path, DateTime.Now.ToString("yyyyMMdd") + ".log");
             Write(content, path);
         }
 

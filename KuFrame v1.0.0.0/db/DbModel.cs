@@ -1,12 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Reflection;
 
 namespace Ku.db
 {
-    public class DbModel : Dictionary<string, object>, ICloneable
+    public class DbModel : Dictionary<string, object>
     {
-        public T ToObject<T>() where T: new()
+        protected string table;
+        public virtual string Table { get; set; }
+
+        public DbModel CopyFrom(DbModel m)
+        {
+            foreach (var key in m.Keys) this[key] = m[key];
+            return this;
+        }
+
+        public T ToObject<T>() where T : new()
         {
             T t = new T();
             PropertyInfo[] properties = typeof(T).GetProperties();
@@ -27,14 +35,13 @@ namespace Ku.db
             return this;
         }
 
-        public object Clone()
-        {
-            DbModel result = new DbModel();
-            foreach (string key in this.Keys)
-            {
-                result[key] = this[key];
-            }
-            return result;
-        }
+        public virtual string Filter(DbModel input) => "WHERE 1=1";
+        public string Filter() => Filter(this);
+        public virtual string Order() => "";
+
+        public virtual void InsertCheck(KuDb db) { }
+        public virtual void UpdateCheck(KuDb db) { }
+
+        
     }
 }

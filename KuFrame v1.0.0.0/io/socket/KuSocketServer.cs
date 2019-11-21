@@ -83,7 +83,7 @@ namespace Ku.io
                     //DictConnection[addr].Disconnect();
                 }
             }
-            catch (Exception ex)
+            catch
             {
             }
         }

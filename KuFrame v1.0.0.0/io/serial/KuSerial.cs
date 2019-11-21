@@ -14,8 +14,7 @@ namespace Ku.io
 
         public byte[] Read()
         {
-            if (BytesToRead <= 0)
-                return new byte[0];
+            if (BytesToRead <= 0) return new byte[0];
             byte[] temp = new byte[BytesToRead];
             Read(temp, 0, temp.Length);
             recvBuffer.Put(temp);

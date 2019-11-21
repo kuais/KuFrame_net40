@@ -55,9 +55,20 @@ namespace Ku.file
         public XmlElement GetElement(string name, XmlElement parent, bool find = false)
         {
             if (parent == null) return null;
-            XmlNodeList list;
-            list = (find) ? parent.SelectNodes(name) : parent.GetElementsByTagName(name);
-            return (list.Count <= 0) ? null : (XmlElement)list[0];
+            if (find)
+            {
+                XmlNodeList list = parent.SelectNodes(name);
+                return (list.Count <= 0) ? null : (XmlElement)list[0];
+            }
+            else
+            {
+                foreach (XmlNode e in parent.ChildNodes)
+                {
+                    if (e.Name.Equals(name) && (e.NodeType == XmlNodeType.Element))
+                        return (XmlElement)e;
+                }
+                return null;
+            }
         }
         /// <summary>
         /// 获取xml子节点列表
