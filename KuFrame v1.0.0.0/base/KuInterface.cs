@@ -1,36 +1,28 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Ku
 {
-    public interface ILog
-    {
-        void AddLog(object text);
-    }
-    public interface IEventTrigger
-    {
-        void TriggerEvent(string name, params object[] args);
-    }
-    public interface ITask
-    {
-    }
+    public interface IDataHandler { void Handle(KuBuffer buffer); }
+    public interface IError { void OnError(Exception ex); }
+    public interface IEventTrigger{ void Trigger(string name, params object[] args); }
+    public interface ILog { void AddLog(object text); }
+    public interface ITask { }
     public interface ITaskHandler
     {
         void AddTask(ITask task);
         void RemoveTask(ITask task);
     }
-    public interface IDataHandler
+    public interface IProtocol
     {
-        void Handle(KuBuffer buffer);
+        byte[] decode(KuBuffer input);
+        List<byte[]> encode(string name, params object[] args);
     }
-    public interface IError
+    public interface IProgress: IError
     {
-        void OnError(Exception ex);
+        void onStart();
+        void onStop();
+        void onProgress(long current, long max, params object[] args);
     }
 
-    //public interface IOHandler
-    //{
-    //    byte[] Read();
-    //    void Write(byte[] temp);
-    //}
-    
 }

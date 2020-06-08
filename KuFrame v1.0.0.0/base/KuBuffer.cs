@@ -13,25 +13,26 @@ namespace Ku
 
         #region public
         /// <summary>
+        /// 数据缓冲区
+        /// </summary>
+        public byte[] Buffers { get; private set; }
+        /// <summary>
+        /// 最后接收时间
+        /// </summary>
+        public DateTime TimeReceived { get; private set; }
+        /// <summary>
         /// 还未处理的数据数
         /// </summary>
         public int DataCount => _dataCount - _curPosition;
         /// <summary>
         /// 缓冲区大小
         /// </summary>
-        public int Size { get => Buffers.Length; set { Resize(value); } }
-        /// <summary>
-        /// 最后接收时间
-        /// </summary>
-        public DateTime TimeReceived { get; private set; }
+        public int Size { get => Buffers.Length; set { Resize(value); } } 
         /// <summary>
         /// 单帧数据接收超时时间
         /// </summary>
         public int Timeout { get; set; } = 500;
-        /// <summary>
-        /// 数据缓冲区
-        /// </summary>
-        public byte[] Buffers { get; private set; }
+
         #endregion
 
         public KuBuffer(int size = 1024)
@@ -40,7 +41,7 @@ namespace Ku
             _curPosition = 0;
             _dataCount = 0;
         }
-        public void Resize(int size)
+        private void Resize(int size)
         {
             if (size == Size) return;
             byte[] temp = Buffers;
@@ -50,8 +51,11 @@ namespace Ku
         }
         public void Put(byte[] newData)
         {
+            Put(newData, newData.Length, 0);
+        }
+        public void Put(byte[] newData, int length, int offset)
+        {
             TimeReceived = DateTime.Now;
-            int length = newData.Length;
             if ((length + _dataCount) > this.Size)
             {   //数据总数超过缓冲区，移除已处理的数据，重建缓冲区
                 _dataCount = DataCount;
@@ -60,7 +64,7 @@ namespace Ku
                 if ((length + _dataCount) > Size)  //清除后依然超出缓冲区，增大缓冲区
                     Resize(length + _dataCount);
             }
-            Buffer.BlockCopy(newData, 0, Buffers, _dataCount, length);
+            Buffer.BlockCopy(newData, offset, Buffers, _dataCount, length);
             _dataCount += length;
         }
         /// <summary>
@@ -108,6 +112,8 @@ namespace Ku
             {
                 i = 0;
                 offset = Find(values[i], offset);
+                if (offset < 0) 
+                    break;
                 while (true)
                 {
                     i++;

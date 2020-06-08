@@ -21,7 +21,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\</OutputPath>
+    <OutputPath>..\bin\debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -30,10 +30,10 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\bin\</OutputPath>
+    <OutputPath>..\bin\relaese\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <WarningLevel>2</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
@@ -89,6 +89,7 @@
     <Compile Include="base\KuBuffer.cs" />
     <Compile Include="base\KuInterface.cs" />
     <Compile Include="base\KuLog.cs" />
+    <Compile Include="base\KuModel.cs" />
     <Compile Include="base\KuPair.cs" />
     <Compile Include="base\KuSafeHandle.cs" />
     <Compile Include="base\KuThread.cs" />
@@ -105,6 +106,8 @@
     <Compile Include="db\SqliteDb.cs" />
     <Compile Include="file\IKuFile.cs" />
     <Compile Include="file\KuCSV.cs" />
+    <Compile Include="io\socket\KuSocket.cs" />
+    <Compile Include="io\socket\KuUdp.cs" />
     <Compile Include="util\KuImage.cs" />
     <Compile Include="file\KuINI.cs" />
     <Compile Include="file\KuXML.cs" />
@@ -113,17 +116,17 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="io\socket\KuSocketInterface.cs" />
-    <Compile Include="io\socket\KuSocketConnection.cs" />
+    <Compile Include="io\socket\KuTcp.cs" />
     <Compile Include="io\socket\KuSocketException.cs" />
-    <Compile Include="io\socket\KuSocketServer.cs" />
+    <Compile Include="io\socket\KuTcpServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="util\KuDll.cs" />
+    <Compile Include="util\KuNet.cs" />
     <Compile Include="util\KuReg.cs" />
     <Compile Include="util\KuConvert.cs" />
     <Compile Include="util\KuFunctions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

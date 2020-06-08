@@ -12,14 +12,14 @@ namespace Ku.file
         public Encoding Encoding { get; set; } = Encoding.Default;
         #endregion
 
-        public KuINI(){ }
+        public KuINI() { }
         public void Load(string path)
         {
             Path = path;
             Dict = new Dictionary<string, Dictionary<string, string>>();
-            string line = "";
-            string currentSection = "";
-            Dictionary<string, string> dictItems = new Dictionary<string, string>();
+            var line = "";
+            var currentSection = "";
+            var dictItems = new Dictionary<string, string>();
             using (StreamReader sr = new StreamReader(Path, Encoding))
             {
                 while ((line = sr.ReadLine()) != null)
@@ -40,8 +40,8 @@ namespace Ku.file
                         int index = line.IndexOf("=");
                         if (index != -1)
                         {
-                            string key = line.Substring(0, index);
-                            string value = line.Substring(index + 1);
+                            var key = line.Substring(0, index);
+                            var value = line.Substring(index + 1);
                             dictItems.Add(key, value);
                         }
                         //else
@@ -70,7 +70,54 @@ namespace Ku.file
                     }
                 }
             }
-            
+        }
+
+        public void Parse(string input)
+        {
+            input = input.Trim();
+            var arr = input.Split(new string[] { "\r\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+            Dict = new Dictionary<string, Dictionary<string, string>>();
+            var currentSection = "";
+            var dictItems = new Dictionary<string, string>();
+            foreach (var line in arr)
+            {
+                if (string.IsNullOrEmpty(line)) continue;
+                if (line.StartsWith("[") && line.EndsWith("]"))
+                {
+                    // End last section  
+                    if ((dictItems.Count > 0) && (!string.IsNullOrEmpty(currentSection)))
+                        Dict[currentSection] = dictItems;
+                    // Start new section
+                    currentSection = line.Substring(1, line.Length - 2).Trim();
+                    dictItems = new Dictionary<string, string>();
+                }
+                else
+                {
+                    int index = line.IndexOf("=");
+                    if (index != -1)
+                    {
+                        string key = line.Substring(0, index);
+                        string value = line.Substring(index + 1);
+                        dictItems.Add(key, value);
+                    }
+                }
+            }
+            // Ends last section  
+            if ((!string.IsNullOrEmpty(currentSection)) && (dictItems.Count > 0))
+                Dict[currentSection] = dictItems;
+        }
+
+        public override string ToString()
+        {
+            var text = new StringBuilder();
+            foreach (string k1 in Dict.Keys)
+            {
+                text.AppendLine($"[{k1}]");
+                foreach (string k2 in Dict[k1].Keys)
+                    text.AppendLine($"{k2}={Dict[k1][k2]}");
+                text.AppendLine();
+            }
+            return text.ToString();
         }
     }
 }

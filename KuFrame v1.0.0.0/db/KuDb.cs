@@ -17,10 +17,9 @@ namespace Ku.db
         public KuSqlBuilder Builder { get; set; }
         public KuLog Logger { get; set; } = null;
 
-        private KuDb() { }
+        protected KuDb() { }
         protected KuDb(string connectstring)
         {
-            TimeOut = 10;
             ConnectString = connectstring;
         }
         public static KuDb NewDb(string connectstring, DbType type = DbType.MsSql)
@@ -29,6 +28,8 @@ namespace Ku.db
             {
                 case DbType.MsSql:
                     return new MsSqlDb(connectstring);
+                case DbType.Sqlite:
+                    return new SqliteDb(connectstring);
                 default:
                     return null;
             }
@@ -38,8 +39,8 @@ namespace Ku.db
         /// <summary>
         /// 超时时间
         /// </summary>
-        public int TimeOut { get; set; }
-        public string ConnectString { get; }
+        public int TimeOut { get; set; } = 10;
+        public string ConnectString { get; set; }
         #endregion
 
         #region 方法
@@ -65,36 +66,39 @@ namespace Ku.db
                 _cmd = _conn.CreateCommand();
                 _cmd.CommandTimeout = TimeOut;
             }
-            Close();
+            else if (_conn.State == ConnectionState.Open)
+                _conn.Close();
             _conn.Open();
         }
         public void Close()
         {
-            if (_conn == null)
-                return;
+            if (_conn == null) return;
             if (_conn.State == ConnectionState.Open)
                 _conn.Close();
+            _cmd.Dispose();
+            _conn = null;
         }
         public void Dispose()
         {
             Close();
+            _conn = null;
         }
 
         public List<DbModel> Query(string sql)
         {
-            List<DbModel> result = new List<DbModel>();
             _cmd.CommandText = sql;
             _cmd.CommandType = CommandType.Text;
             using (DbDataReader reader = _cmd.ExecuteReader())
             {
-                if (!reader.HasRows)
-                    return result;
-                string[] colNames = new string[reader.FieldCount];
+                List<DbModel> result = new List<DbModel>();
+                if (!reader.HasRows) return result;
+                if (reader.VisibleFieldCount == 0) return result;
+                var colNames = new string[reader.FieldCount];
                 for (int i = 0; i < reader.FieldCount; i++)
                     colNames[i] = reader.GetName(i);                            //获取列名
                 while (reader.Read())
                 {                                                               //获取行数据
-                    DbModel m = new DbModel();
+                    var m = new DbModel();
                     for (int i = 0; i < reader.FieldCount; i++)
                         m[colNames[i]] = (reader.IsDBNull(i)) ? null : reader[i];
                     result.Add(m);
@@ -104,8 +108,20 @@ namespace Ku.db
         }
         public DbModel QueryOne(string sql)
         {
-            var r = Query(sql);
-            return (r.Count == 0) ? null : r[0];
+            _cmd.CommandText = sql;
+            _cmd.CommandType = CommandType.Text;
+            using (DbDataReader reader = _cmd.ExecuteReader())
+            {
+                if (!reader.HasRows) return null;
+                var colNames = new string[reader.FieldCount];
+                for (int i = 0; i < reader.FieldCount; i++)
+                    colNames[i] = reader.GetName(i);                            //获取列名
+                reader.Read();
+                var m = new DbModel();
+                for (int i = 0; i < reader.FieldCount; i++)
+                    m[colNames[i]] = (reader.IsDBNull(i)) ? null : reader[i];
+                return m;
+            }
         }
         public DataTable QueryTable(string sql)
         {
@@ -223,7 +239,7 @@ namespace Ku.db
             Builder.From(param.From).Filter(param.Filter);
             return QueryOne(Builder.Order(param.Order).Select(param.Select));
         }
-        public dynamic Query(QueryParam param= null)
+        public dynamic Query(QueryParam param = null)
         {
             Builder.From(param.From).Filter(param.Filter);
             if (param.Page == 0 || param.PageSize == 0)
@@ -231,7 +247,7 @@ namespace Ku.db
             else
             {
                 //total
-                var total = (int)ExecuteScalar(Builder.Select("COUNT(1)"));
+                var total = ExecuteScalar(Builder.Select("COUNT(1)"));
                 //datas
                 Builder.Order(param.Order).Select(param.Select);
                 var datalist = Query(Builder.Page(param.Page, param.PageSize));

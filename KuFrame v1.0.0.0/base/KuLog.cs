@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Threading;
 
 namespace Ku
 {
@@ -22,14 +23,19 @@ namespace Ku
             Write(content, path);
         }
 
-        private static readonly object oLock = new object();
+        private ReaderWriterLockSlim _rw = new ReaderWriterLockSlim();
         private void Write(string content, string path)
         {
-            lock (oLock)
+            try
             {
+                _rw.EnterWriteLock();
                 content = string.Format("[{0}]\r\n{1}\r\n"
                     , DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"), content);
                 File.AppendAllText(path, content);
+            }
+            finally 
+            {
+                _rw.ExitWriteLock();
             }
         }
 

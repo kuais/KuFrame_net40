@@ -1,70 +1,84 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Threading;
 
 namespace Ku
 {
-    public abstract class KuThread
+    public class KuThread
     {
-        public Action onStart;
-        public Action onStop;
-        public Action action;
-        public int interval;
-        public abstract void Start();
-        /// <summary>
-        /// 在新线程执行操作
-        /// </summary>
-        /// <param name="action">要执行的操作</param>
-        /// <param name="interval">延迟多少毫秒执行</param>
-        public virtual void Start(Action action, int interval = 0)
-        {
-            this.action = action;
-            this.interval = interval;
-            this.Start();
-        }
-    }
-    public class RunThread : KuThread
-    {
-        public RunThread()
-        {
-            interval = 0;
-        }
+        public IProgress Listener;
+        public bool IsStop { get; private set; } = false;
+        public bool IsLoop { get; private set; } = false;
 
-        public override void Start()
+        public KuThread() { }
+        public void Invoke(ISynchronizeInvoke o, Action action)
+        {
+            if (o.InvokeRequired) o.Invoke(action, null);
+            else action();
+        }
+        public void Run(Action action, int delay = 0)
         {
             new Thread(() =>
             {
-                onStart?.Invoke();
-                Thread.Sleep(interval);
-                action?.Invoke();
-                onStop?.Invoke();
-            }).Start();
-        }
-    }
-
-    public class LoopThread : KuThread
-    {
-        public bool Running { get; private set; } = false;
-        public LoopThread()
-        {
-            interval = 1000;
-        }
-        public override void Start()
-        {
-            Running = true;
-            new Thread(() =>
-            {
-                onStart?.Invoke();
-                while (Running)
+                OnStart();
+                try
                 {
-                    Thread.Sleep(interval);
+                    Thread.Sleep(delay);
                     action?.Invoke();
                 }
-                onStop?.Invoke();
+                catch(Exception ex)
+                {
+                    Listener?.OnError(ex);
+                }
+                OnStop();
             }).Start();
         }
-        public void Stop()
+        public void Loop(Action action, int interval = 0)
         {
-            Running = false;
+            IsLoop = true;
+            new Thread(() =>
+            {
+                OnStart();
+                try
+                {
+                    while (IsLoop)
+                    {
+                        Thread.Sleep(interval);
+                        action?.Invoke();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Listener?.OnError(ex);
+                }
+                OnStop();
+            }).Start();
+        }
+        public void StopLoop() { IsLoop = false; }
+        public void WaitStop()
+        {
+            while (!IsStop)
+            {
+                try
+                {
+                    Thread.Sleep(1);
+                }
+                catch (Exception ex)
+                {
+                    Listener?.OnError(ex);
+                }
+            }
+        }
+
+        private void OnStart()
+        {
+            IsStop = false;
+            Listener?.onStart();
+        }
+        private void OnStop()
+        {
+            IsStop = true;
+            Listener?.onStop();
         }
     }
 }

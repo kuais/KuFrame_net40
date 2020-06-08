@@ -28,7 +28,6 @@ namespace Ku
             }
             return base.Equals(obj);
         }
-
         public override int GetHashCode()
         {
             var hashCode = 206514262;

@@ -1,10 +1,12 @@
-﻿namespace Ku.io
+﻿using System.Net.Sockets;
+
+namespace Ku.io.socket
 {
-    public interface IConnectionListener : IError
+    public interface ISocketListener : IError
     {
-        void OnConnected(KuSocketConnection conn);
-        void OnDisconnected(KuSocketConnection conn);
-        void OnReceived(KuSocketConnection conn, byte[] data);
-        void OnSent(KuSocketConnection conn, byte[] data);
+        void OnConnected(KuSocket c);
+        void OnDisconnected(KuSocket c);
+        void OnReceived(KuSocket c, byte[] data);
+        void OnSent(KuSocket c, byte[] data);
     }
 }

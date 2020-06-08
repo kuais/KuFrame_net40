@@ -32,7 +32,6 @@ namespace Ku.file
                 }
             }
         }
-
         public void Save(string path = "")
         {
             if (string.IsNullOrEmpty(path)) path = Path;

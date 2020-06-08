@@ -6,9 +6,9 @@ namespace Ku.db
     public class KuSqlBuilder
     {
         public string Sql { get; set; }
-        private string _from = "";
-        private string _order = "";
-        private string _filter = "";
+        protected string _from = "";
+        protected string _order = "";
+        protected string _filter = "";
 
         protected KuSqlBuilder()
         {
@@ -26,68 +26,70 @@ namespace Ku.db
         }
         public KuSqlBuilder From(string from)
         {
-            if (string.IsNullOrEmpty(from))
-                throw new Exception("From should not be empty!");
             _from = from;
             return this;
         }
         public KuSqlBuilder Filter(string filter = "")
         {
             _filter = filter;
+            if (!string.IsNullOrEmpty(_filter) && (!_filter.StartsWith(" ")))
+                _filter = " " + _filter;
             return this;
         }
-        public KuSqlBuilder Order(string order = "")
+        public virtual KuSqlBuilder Order(string order = "")
         {
             if (string.IsNullOrEmpty(order))
                 _order = "";
             else
-                _order = string.Format("row_number() OVER(ORDER BY {0}) as RowNum,", order);
+                _order = string.Format(" ORDER BY {0}", order);
             return this;
         }
-        public string Select(string select = "*", bool distinct = false)
+        public virtual string Select(string select = "*", bool distinct = false)
         {
-            if (string.IsNullOrEmpty(_from)) throw new Exception("Please call From first!");
+            Sql = "";
+            if (string.IsNullOrEmpty(_from)) return Sql;
             if (string.IsNullOrEmpty(select)) select = "*";
-            string _distinct = (distinct) ? "DISTINCT " : "";
-            Sql = $"SELECT {_distinct}{_order}{select} FROM {_from} {_filter}";
+            var _distinct = (distinct) ? "DISTINCT " : "";
+            Sql = $"SELECT {_distinct}{select} FROM {_from}{_filter}{_order}";
             return Sql;
         }
         public string Delete(string target = "")
         {
+            Sql = "";
+            if (string.IsNullOrEmpty(_from)) return Sql;
             Sql = $"DELETE {target} FROM {_from} {_filter}";
             return Sql;
         }
         public string Insert(IDictionary<string, object> fields)
         {
-            int i = 0;
-            string[] arr = new string[fields.Count];
-            foreach (string k in fields.Keys) arr[i++] = Raw(fields[k]);
-            Sql = $"INSERT INTO {_from}({string.Join(",", fields.Keys)}) VALUES ({string.Join(",", arr)})";
+            Sql = "";
+            if (string.IsNullOrEmpty(_from)) return Sql;
+            var keys = new string[fields.Count];
+            var values = new string[fields.Count];
+            fields.Keys.CopyTo(keys, 0);
+            for (int i = 0; i < keys.Length; i++)
+            {
+                values[i] = Raw(fields[keys[i]]);
+                keys[i] = $"[{keys[i]}]";
+            }
+            Sql = $"INSERT INTO {_from}({string.Join(",", keys)}) VALUES ({string.Join(",", values)})";
             return Sql;
         }
         public string Update(IDictionary<string, object> fields)
         {
-            int i = 0;
-            string[] arr = new string[fields.Count];
-            foreach (string k in fields.Keys) arr[i++] = string.Format("{0}={1}", k, Raw(fields[k]));
-            Sql = $"UPDATE {_from} SET {string.Join(",", arr)} {_filter}";
+            Sql = "";
+            if (string.IsNullOrEmpty(_from)) return Sql;
+            var keys = new string[fields.Count];
+            var values = new string[fields.Count];
+            fields.Keys.CopyTo(keys, 0);
+            for (int i = 0; i < keys.Length; i++)
+            {
+                values[i] = $"[{keys[i]}]={Raw(fields[keys[i]])}";
+            }
+            Sql = $"UPDATE {_from} SET {string.Join(",", values)} {_filter}";
             return Sql;
         }
-        /// <summary>
-        /// 须在Order和Select之后执行
-        /// </summary>
-        /// <param name="page">页码</param>
-        /// <param name="pageSize">单页记录数</param>
-        /// <returns>查询语句</returns>
-        public string Page(int page, int pageSize)
-        {
-            //if (string.IsNullOrEmpty(_order)) throw new Exception("Please call Order Function first!");
-            if (string.IsNullOrEmpty(Sql)) throw new Exception("Please call Select Function first!");
-            if ((page <= 0) || (pageSize <= 0)) return Sql;
-            if (!Sql.ToUpper().Contains("ORDER BY ")) throw new Exception("Please call Order Function first!");
-            page--;
-            return $"SELECT * FROM ({Sql}) PageT WHERE RowNum >{pageSize * page} AND RowNum <={pageSize * (page + 1)}";
-        }
+        public virtual string Page(int page, int pageSize) => Sql;
 
         /// <summary>
         /// 根据对象类型格式化SQL字符串
@@ -97,7 +99,11 @@ namespace Ku.db
         public static string Raw(object input)
         {
             if (input is null) return "NULL";
-            if (input is string) return $"'{input}'";
+            if (input is string)
+			{
+                input = ((string)input).Replace("'", "''");
+                return $"'{input}'";
+			}
             if (input is DateTime) return $"'{((DateTime)input).ToString("yyyy-MM-dd HH:mm:ss")}'";
             return input.ToString();
         }
