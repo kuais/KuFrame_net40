@@ -10,7 +10,7 @@ namespace Ku.io.socket
 
         #region Properties
         public bool IsStarted { get; private set; } = false;
-        public int ConnectionTimeout { get; set; } = 0;                 //0 不断开连接, 300秒无数据则断开连接
+        public int ConnectionTimeout { get; set; } = 300;                 //0 不断开连接, 300秒无数据则断开连接
         public int ListenLimit { get; set; } = 1000;                                                               //排队Accept的连接上限
         public int ConnectionCount { get => DictConnection.Count; }
         #endregion

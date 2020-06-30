@@ -16,7 +16,7 @@ namespace Ku.db
         public virtual void InsertCheck(KuDb db) { }
         public virtual void UpdateCheck(KuDb db) { }
 
-        protected List<string> Sql_UpgradeTable(string[] fields)
+        public List<string> Sql_UpgradeTable(string[] fields)
         {
             var s = string.Join(",", fields);
             List<string> list = new List<string>();

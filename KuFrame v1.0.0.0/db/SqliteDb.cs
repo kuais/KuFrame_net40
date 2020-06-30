@@ -1,11 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SQLite;
+using System.Threading;
 
 namespace Ku.db
 {
     public class SqliteDb : KuDb
     {
+        private static readonly ReaderWriterLockSlim lock0 = new ReaderWriterLockSlim();
         public SqliteDb()
         {
             Builder = new SqliteBuilder();
@@ -21,6 +24,18 @@ namespace Ku.db
         }
         public List<DbModel> ListTableNames() => Query(((SqliteBuilder)Builder).ListTableNames());
 
+        public override void DoAction(Action action)
+        {
+            lock0.EnterWriteLock();
+            try
+            {
+                base.DoAction(action);
+            }
+            finally
+            {
+                lock0.ExitWriteLock();
+            }
+        }
         //public void ChangePassword(string password)
         //{
         //    SQLiteConnection conn = _conn as SQLiteConnection;
