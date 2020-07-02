@@ -14,6 +14,7 @@ namespace Ku.file
         #endregion
 
         public KuCSV() { }
+        public KuCSV(string path) => Load(path);
         public void Load(string path)
         {
             Path = path;

@@ -46,7 +46,7 @@ namespace Ku.db
         #region 方法
         protected abstract DbConnection InitConnection();
         private void LogSQL(string sql) => Logger?.Log(sql, "SQL");
-        public void DoAction(Action action)
+        public virtual void DoAction(Action action)
         {
             try
             {
