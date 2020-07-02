@@ -95,7 +95,7 @@
     <Compile Include="base\KuPair.cs" />
     <Compile Include="base\KuSafeHandle.cs" />
     <Compile Include="base\KuThread.cs" />
-    <Compile Include="base\KuSysWindows.cs" />
+    <Compile Include="base\KuWinApi.cs" />
     <Compile Include="crypto\KuRSA.cs" />
     <Compile Include="crypto\KuSHA.cs" />
     <Compile Include="crypto\KuAES.cs" />
