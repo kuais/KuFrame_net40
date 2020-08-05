@@ -10,14 +10,9 @@ namespace Ku.db
         protected string _order = "";
         protected string _filter = "";
 
-        protected KuSqlBuilder()
-        {
-            Sql = "";
-        }
-        protected KuSqlBuilder(string from)
-        {
-            _from = from;
-        }
+        protected KuSqlBuilder() => Sql = "";
+        protected KuSqlBuilder(string from) : this() => _from = from;
+
         public KuSqlBuilder Clear()
         {
             _filter = "";
@@ -70,7 +65,7 @@ namespace Ku.db
             for (int i = 0; i < keys.Length; i++)
             {
                 values[i] = Raw(fields[keys[i]]);
-                keys[i] = $"[{keys[i]}]";
+                keys[i] = ToField(keys[i]);
             }
             Sql = $"INSERT INTO {_from}({string.Join(",", keys)}) VALUES ({string.Join(",", values)})";
             return Sql;
@@ -84,12 +79,14 @@ namespace Ku.db
             fields.Keys.CopyTo(keys, 0);
             for (int i = 0; i < keys.Length; i++)
             {
-                values[i] = $"[{keys[i]}]={Raw(fields[keys[i]])}";
+                values[i] = $"{ToField(keys[i])}={Raw(fields[keys[i]])}";
             }
             Sql = $"UPDATE {_from} SET {string.Join(",", values)} {_filter}";
             return Sql;
         }
         public virtual string Page(int page, int pageSize) => Sql;
+
+        protected virtual string ToField(string v) => $"[{v}]";
 
         /// <summary>
         /// 根据对象类型格式化SQL字符串
@@ -104,7 +101,7 @@ namespace Ku.db
                 input = ((string)input).Replace("'", "''");
                 return $"'{input}'";
 			}
-            if (input is DateTime) return $"'{((DateTime)input).ToString("yyyy-MM-dd HH:mm:ss")}'";
+            if (input is DateTime) return $"'{(DateTime)input:yyyy-MM-dd HH:mm:ss}'";
             return input.ToString();
         }
 
@@ -118,5 +115,6 @@ namespace Ku.db
             sql = sql.Replace("'", "''");
             return sql;
         }
+
     }
 }

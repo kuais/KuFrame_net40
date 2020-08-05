@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace Ku
+namespace Ku.winapi
 {
-    public class KuWinApi
+    public class User32
     {
         public const int GWL_STYLE = (-16);
         public const int GWL_EXSTYLE = (-20);

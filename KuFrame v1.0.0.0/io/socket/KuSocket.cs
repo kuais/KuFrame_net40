@@ -15,7 +15,7 @@ namespace Ku.io.socket
 
         #region Properties
         public Dictionary<string, KuSocket> DictConnection { get; } = new Dictionary<string, KuSocket>();
-        public EndPoint LocalEndPoint { get => socket.LocalEndPoint; }
+        public EndPoint LocalEndPoint { get; protected set; }
         public EndPoint RemoteEndPoint { get; set; }
         public KuBuffer RecvBuffer { get; private set; }
         public DateTime TimeActivated { get; private set; }
@@ -64,7 +64,12 @@ namespace Ku.io.socket
         }
 
         public virtual void Bind(string ip, int port) => Bind(new IPEndPoint(IPAddress.Parse(ip), port));    //设置监听地址和端口   
-        public virtual void Bind(IPEndPoint ep) => socket.Bind(ep);                                          //设置监听地址和端口   
+        public virtual void Bind(IPEndPoint ep)
+        {
+            socket.Bind(ep);                                          //设置监听地址和端口   
+            LocalEndPoint = socket.LocalEndPoint;
+        }
+
         public virtual void Activate() => TimeActivated = DateTime.Now;
         public virtual void Receive() => throw new NotImplementedException();
 
@@ -85,13 +90,15 @@ namespace Ku.io.socket
         }
         protected virtual void DisConnected(SocketAsyncEventArgs e)
         {
-            if ((RemoteEndPoint == null) || (Socket == null)) return;
+            //if ((RemoteEndPoint == null) || (Socket == null)) return;
+            if (Socket == null) 
+                return;
+            Listener?.OnDisconnected(this);
             lock (((ICollection)DictConnection).SyncRoot)
             {
                 DictConnection.Remove(RemoteEndPoint.ToString());
+                //this.RemoteEndPoint = null;
             }
-            Listener?.OnDisconnected(this);
-            this.RemoteEndPoint = null;
         }
         protected virtual void Received(SocketAsyncEventArgs e)
         {
@@ -162,21 +169,19 @@ namespace Ku.io.socket
         }
         protected void ProcessReceive(SocketAsyncEventArgs e)
         {
-            if (e.SocketError != SocketError.Success)
+            if (Socket == null)
+                PushArgs(e, 0);
+            else if (e.SocketError != SocketError.Success)
             {
                 PushArgs(e, 0);
-                if (this.Socket != null)
-                    this.Close();
                 Listener?.OnError(new KuSocketException(e));                //接收出错
+                this.Close();
             }
             else if (e.BytesTransferred == 0)
             {                                                               //收到空数据 = 断线
                 PushArgs(e, 0);
-                if (this.Socket != null && this.Socket.Connected)
-                {
-                    DisConnected(e);
-                    this.Close();
-                }
+                DisConnected(e);
+                this.Close();
             }
             else
             {

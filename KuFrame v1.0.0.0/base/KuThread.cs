@@ -11,10 +11,12 @@ namespace Ku
         public bool IsLoop { get; private set; } = false;
 
         public KuThread() { }
-        public void Invoke(ISynchronizeInvoke o, Action action)
+        public static void Invoke(ISynchronizeInvoke o, Action action)
         {
-            if (o.InvokeRequired) o.Invoke(action, null);
-            else action();
+            if (o.InvokeRequired)
+                o.Invoke(action, null);
+            else
+                action();
         }
         public void Run(Action action, int delay = 0)
         {

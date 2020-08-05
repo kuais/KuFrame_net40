@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ku.winapi;
+using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -47,12 +48,12 @@ namespace Ku.util
         {
             if (p == null || c == null ||p.MainWindowHandle == IntPtr.Zero)
                 return false;
-            KuWinApi.SetParent(p.MainWindowHandle, c.Handle);
+            User32.SetParent(p.MainWindowHandle, c.Handle);
             // Move the window to overlay it on this window
-            KuWinApi.MoveWindow(p.MainWindowHandle, 0, 0, c.Width, c.Height, true);
+            User32.MoveWindow(p.MainWindowHandle, 0, 0, c.Width, c.Height, true);
             // Remove border and whatnot            
             var hwnd = new HandleRef(c, p.MainWindowHandle);
-            KuWinApi.SetWindowLong(hwnd, KuWinApi.GWL_STYLE, KuWinApi.WS_VISIBLE);
+            User32.SetWindowLong(hwnd, User32.GWL_STYLE, User32.WS_VISIBLE);
             return true;
         }
     }

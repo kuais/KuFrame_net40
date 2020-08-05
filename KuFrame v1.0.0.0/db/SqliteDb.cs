@@ -9,26 +9,24 @@ namespace Ku.db
     public class SqliteDb : KuDb
     {
         private static readonly ReaderWriterLockSlim lock0 = new ReaderWriterLockSlim();
-        public SqliteDb()
-        {
-            Builder = new SqliteBuilder();
-        }
-        public SqliteDb(string connectstring) : base(connectstring)
-        {
-            Builder = new SqliteBuilder();
-        }
 
-        protected override DbConnection InitConnection()
-        {
-            return new SQLiteConnection(ConnectString);
-        }
+        public SqliteDb() { }
+        public SqliteDb(string connectstring) : base(connectstring) { }
+
+        protected override DbConnection InitConnection() => new SQLiteConnection(ConnectString);
+        protected override KuSqlBuilder InitBuilder() => new SqliteBuilder();
         public List<DbModel> ListTableNames() => Query(((SqliteBuilder)Builder).ListTableNames());
-
+        public void ChangePassword(string password) => DoAction(() => ((SQLiteConnection)_conn).ChangePassword(password));
+        public void SetPassword(string password)
+        {
+            if (_conn == null) _conn = InitConnection();
+            ((SQLiteConnection)_conn).SetPassword(password);
+        }
         public override void DoAction(Action action)
         {
-            lock0.EnterWriteLock();
             try
             {
+                lock0.EnterWriteLock();
                 base.DoAction(action);
             }
             finally
@@ -36,23 +34,12 @@ namespace Ku.db
                 lock0.ExitWriteLock();
             }
         }
-        //public void ChangePassword(string password)
-        //{
-        //    SQLiteConnection conn = _conn as SQLiteConnection;
-        //    conn.ChangePassword(password);
-        //}
-        public void SetPassword(string password)
-        {
-            SQLiteConnection conn = _conn as SQLiteConnection;
-            var connSb = new SQLiteConnectionStringBuilder();
-            connSb.Password = password;
-            conn.ConnectionString = connSb.ToString();
-        }
     }
+
     public class SqliteBuilder : KuSqlBuilder
     {
-        public SqliteBuilder() : base() { }
-        public SqliteBuilder(string from) : base(from) { }
+        public SqliteBuilder() : base() {}
+        public SqliteBuilder(string from) : base(from) {}
 
         public string ListTableNames() => "SELECT name FROM sqlite_master WHERE TYPE='table'";
 

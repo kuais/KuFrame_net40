@@ -90,6 +90,8 @@ namespace Ku.io.socket
             catch (Exception ex)
             {
                 Listener?.OnError(ex);
+                DisConnected(e);
+                this.Close();
             }
         }
         protected override void Send(byte[] data, SocketAsyncEventArgs e)
@@ -108,6 +110,7 @@ namespace Ku.io.socket
         internal void Connected(Socket socket)
         {
             Socket = socket;
+            LocalEndPoint = socket.LocalEndPoint;
             RemoteEndPoint = socket.RemoteEndPoint;
             Server?.AddConnection(this);
             Activate();
@@ -123,7 +126,8 @@ namespace Ku.io.socket
         }
         protected override void DisConnected(SocketAsyncEventArgs e)
         {
-            if((RemoteEndPoint == null) || (Socket == null)) return;
+            //if((RemoteEndPoint == null) || (Socket == null)) return;
+            if (Socket == null) return;
             Server?.RemoveConnection(this);
             base.DisConnected(e);
             Server = null;

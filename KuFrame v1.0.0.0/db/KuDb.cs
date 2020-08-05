@@ -11,17 +11,15 @@ namespace Ku.db
 
     public abstract class KuDb : IDisposable
     {
-        private DbCommand _cmd;
+        protected DbCommand _cmd;
         protected DbConnection _conn;
 
         public KuSqlBuilder Builder { get; set; }
         public KuLog Logger { get; set; } = null;
 
-        protected KuDb() { }
-        protected KuDb(string connectstring)
-        {
-            ConnectString = connectstring;
-        }
+        protected KuDb() => Builder = InitBuilder();
+        protected KuDb(string connectstring) : this() => ConnectString = connectstring;
+
         public static KuDb NewDb(string connectstring, DbType type = DbType.MsSql)
         {
             switch (type)
@@ -45,6 +43,7 @@ namespace Ku.db
 
         #region 方法
         protected abstract DbConnection InitConnection();
+        protected abstract KuSqlBuilder InitBuilder();
         private void LogSQL(string sql) => Logger?.Log(sql, "SQL");
         public virtual void DoAction(Action action)
         {
@@ -58,25 +57,23 @@ namespace Ku.db
                 Close();
             }
         }
-        public void Open()
+        public virtual void Open()
         {
             if (_conn == null)
-            {
                 _conn = InitConnection();
-                _cmd = _conn.CreateCommand();
-                _cmd.CommandTimeout = TimeOut;
-            }
-            else if (_conn.State == ConnectionState.Open)
+            if (_conn.State == ConnectionState.Open)
                 _conn.Close();
             _conn.Open();
+            _cmd = _conn.CreateCommand();
+            _cmd.CommandTimeout = TimeOut;
         }
         public void Close()
         {
             if (_conn == null) return;
             if (_conn.State == ConnectionState.Open)
                 _conn.Close();
-            _cmd.Dispose();
-            _conn = null;
+            if (_cmd != null) _cmd.Dispose();
+            //_conn = null;
         }
         public void Dispose()
         {

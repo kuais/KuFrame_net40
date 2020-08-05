@@ -28,7 +28,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\bin\relaese\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
@@ -55,6 +55,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
+    <WarningLevel>1</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -75,6 +76,10 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MySql.Data, Version=6.9.12.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <HintPath>F:\工作\程序_2013\信报箱\信报箱 v1\XBX_4_6\信报箱MySql测试 v1.0.1\packages\MySql.Data.6.9.12\lib\net40\MySql.Data.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
@@ -95,17 +100,18 @@
     <Compile Include="base\KuPair.cs" />
     <Compile Include="base\KuSafeHandle.cs" />
     <Compile Include="base\KuThread.cs" />
-    <Compile Include="base\KuWinApi.cs" />
     <Compile Include="crypto\KuRSA.cs" />
     <Compile Include="crypto\KuSHA.cs" />
     <Compile Include="crypto\KuAES.cs" />
     <Compile Include="crypto\KuDES.cs" />
     <Compile Include="crypto\KuMD5.cs" />
     <Compile Include="crypto\ICrypto.cs" />
+    <Compile Include="db\AccessDb.cs" />
     <Compile Include="db\DbModel.cs" />
     <Compile Include="db\KuDb.cs" />
     <Compile Include="db\KuSqlBuilder.cs" />
     <Compile Include="db\MsSqlDb.cs" />
+    <Compile Include="db\MySqlDb.cs" />
     <Compile Include="db\SqliteDb.cs" />
     <Compile Include="file\IKuFile.cs" />
     <Compile Include="file\KuCSV.cs" />
@@ -129,6 +135,8 @@
     <Compile Include="util\KuReg.cs" />
     <Compile Include="util\KuConvert.cs" />
     <Compile Include="util\KuFunctions.cs" />
+    <Compile Include="winapi\Kernel32.cs" />
+    <Compile Include="winapi\User32.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
