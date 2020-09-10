@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+//using System.Dynamic;
 using System.Reflection;
 
 namespace Ku
@@ -26,6 +27,14 @@ namespace Ku
             foreach (PropertyInfo p in properties)
                 this[p.Name] = p.GetValue(t, null);
         }
+
+        //public dynamic ToDynamic()
+        //{
+        //    dynamic result = new ExpandoObject();
+        //    foreach (var entry in this)
+        //        ((ICollection<KeyValuePair<string, object>>)result).Add(new KeyValuePair<string, object>(entry.Key, entry.Value));
+        //    return result;
+        //}
 
     }
 }

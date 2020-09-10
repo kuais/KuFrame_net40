@@ -15,8 +15,8 @@ namespace Ku
     }
     public interface IProtocol
     {
-        byte[] decode(KuBuffer input);
-        List<byte[]> encode(string name, params object[] args);
+        byte[] Decode(KuBuffer input);
+        List<byte[]> Encode(string name, params object[] args);
     }
     public interface IProgress: IError
     {

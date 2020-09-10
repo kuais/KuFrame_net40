@@ -36,8 +36,8 @@ namespace Ku
 
         public static bool operator !=(KuSafeHandle value1, KuSafeHandle value2)
         {
-            if (Equals(value1, null) && object.Equals(value2, null)) return false;
-            if (Equals(value1, null) || object.Equals(value2, null)) return true;
+            if (Equals(value1, null) && Equals(value2, null)) return false;
+            if (Equals(value1, null) || Equals(value2, null)) return true;
             return value1.handle != value2.handle;
         }
     }

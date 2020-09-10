@@ -5,22 +5,21 @@ using System.Text.RegularExpressions;
 
 namespace Ku.file
 {
-    public class KuCSV : IKuFile
+    public class KuCSV2 : IKuFile
     {
         #region Properties
         public string Path { get; private set; }
-        public List<string> fields { get; set; }
-        public List<KuModel> datas { get; set; }
+        public Dictionary<string, string> Dict { get; private set; }
         public Encoding Encoding { get; set; } = Encoding.Default;
         #endregion
 
-        public KuCSV() { }
-        public KuCSV(string path) => Load(path);
+        public KuCSV2() { }
+        public KuCSV2(string path) => Load(path);
         public void Load(string path)
         {
             Path = path;
-            datas = new List<KuModel>();
-            var line = "";
+            Dict = new Dictionary<string, string>();
+            string line = "";
             using (StreamReader sr = new StreamReader(Path, Encoding))
             {
                 while ((line = sr.ReadLine()) != null)
@@ -29,15 +28,8 @@ namespace Ku.file
                     if (string.IsNullOrEmpty(line)) continue;
                     line = line.Replace("\t", "");
                     line = line.Replace("\"", "");
-                    var arr = Regex.Split(line, ",", RegexOptions.None);
-                    var m = new KuModel();
-                    for(int i = 0; i < arr.Length; i++)
-                    {
-                        if (i >= fields.Count)
-                            break;
-                        m[fields[i]] = arr[i];
-                    }
-                    datas.Add(m);
+                    string[] arr = Regex.Split(line, ",", RegexOptions.None);
+                    Dict[arr[0]] = arr[1];
                 }
             }
         }
@@ -46,12 +38,9 @@ namespace Ku.file
             if (string.IsNullOrEmpty(path)) path = Path;
             using (StreamWriter sw = new StreamWriter(path, false, Encoding))
             {
-                foreach (KuModel m in datas)
+                foreach (string k1 in Dict.Keys)
                 {
-                    var arr = new string[fields.Count];
-                    for (int i = 0; i < fields.Count; i++)
-                        arr[i] = $"\"{m[fields[i]]}\"";
-                    string temp = string.Join(",", arr);
+                    string temp = string.Format("\"{0}\",\"{1}\"", k1, Dict[k1]);
                     sw.WriteLine(temp);
                 }
             }

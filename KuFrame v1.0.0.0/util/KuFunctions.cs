@@ -69,6 +69,8 @@ namespace Ku.util
             return result;
         }
 
+        public static string GetError(Exception ex) => string.IsNullOrEmpty(ex.Message) ? ex.ToString() : ex.Message;
+
         /// <summary>
         /// 执行操作,兼容多线程
         /// </summary>

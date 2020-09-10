@@ -7,7 +7,7 @@ namespace Ku
     public class KuThread
     {
         public IProgress Listener;
-        public bool IsStop { get; private set; } = false;
+        public bool IsStop { get; private set; } = true;
         public bool IsLoop { get; private set; } = false;
 
         public KuThread() { }
@@ -51,6 +51,7 @@ namespace Ku
                 }
                 catch (Exception ex)
                 {
+                    IsLoop = false;
                     Listener?.OnError(ex);
                 }
                 OnStop();
@@ -59,6 +60,7 @@ namespace Ku
         public void StopLoop() { IsLoop = false; }
         public void WaitStop()
         {
+            StopLoop();
             while (!IsStop)
             {
                 try

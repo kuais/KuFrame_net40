@@ -107,7 +107,7 @@ namespace Ku.util
         public static void SetAutoRun(string keyName, string filePath)
         {
             string path = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
-            KuReg.Save(Registry.LocalMachine, path, keyName, filePath);
+            Save(Registry.LocalMachine, path, keyName, filePath);
         }
 
         /// <summary>
@@ -117,7 +117,7 @@ namespace Ku.util
         public static void DelAutoRun(string keyName)
         {
             var path = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
-            KuReg.Delete(Registry.LocalMachine, path, keyName);
+            Delete(Registry.LocalMachine, path, keyName);
         }
 
         /// <summary>
@@ -128,7 +128,7 @@ namespace Ku.util
         public static string GetAutoRun(string keyName)
         {
             string path = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
-            return KuReg.Load(Registry.LocalMachine, path, keyName, "")?.ToString();
+            return Load(Registry.LocalMachine, path, keyName, "")?.ToString();
         }
 
     }
