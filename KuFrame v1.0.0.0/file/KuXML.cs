@@ -35,30 +35,21 @@ namespace Ku.file
             Doc.AppendChild(Doc.CreateXmlDeclaration("1.0", "UTF-8", null));
         }
         /// <summary>
-        /// 获取指定名称的第一个节点
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public XmlElement GetElement(string name = "", bool find = false)
-        {
-            if (string.IsNullOrEmpty(name)) return Doc.DocumentElement;
-            XmlNodeList list;
-            list = (find) ?  Doc.SelectNodes(name) : Doc.GetElementsByTagName(name);
-            return (list.Count <= 0) ? null : (XmlElement)list[0];
-        }
-        /// <summary>
         /// 获取指定名称的第一个子节点
         /// </summary>
         /// <param name="name">节点名称</param>
         /// <param name="parent">父节点</param>
         /// <returns></returns>
-        public XmlElement GetElement(string name, XmlElement parent, bool find = false)
+        public XmlElement GetElement(string name, XmlElement parent = null, bool find = false)
         {
-            if (parent == null) return null;
+            if (parent == null) 
+                parent = Doc.DocumentElement;
+            if (string.IsNullOrEmpty(name)) return parent;
             if (find)
             {
                 XmlNodeList list = parent.SelectNodes(name);
-                return (list.Count <= 0) ? null : (XmlElement)list[0];
+                if (list.Count > 0)
+                    return (XmlElement)list[0];
             }
             else
             {
@@ -66,9 +57,9 @@ namespace Ku.file
                 {
                     if (e.Name.Equals(name) && (e.NodeType == XmlNodeType.Element))
                         return (XmlElement)e;
-                }
-                return null;
+                } 
             }
+            return null;
         }
         /// <summary>
         /// 获取xml子节点列表
@@ -92,11 +83,13 @@ namespace Ku.file
         }
         public XmlElement AddElement(string name, XmlElement parent = null)
         {
-            XmlElement elemRoot = Doc.CreateElement(name);
+            var elemRoot = Doc.CreateElement(name);
             if (parent == null)
-                return Doc.AppendChild(elemRoot) as XmlElement;
-            else
-                return parent.AppendChild(elemRoot) as XmlElement;
+                parent = Doc.DocumentElement;
+            var elem = GetElement(name, parent);
+            if (elem != null)
+                return elem;
+            return parent.AppendChild(elemRoot) as XmlElement;
         }
 
         /// <summary>
@@ -128,6 +121,14 @@ namespace Ku.file
                 result.Add(t);
             }
             return result;
+        }
+
+        public string getAttribute(XmlElement elem, string attribute, string defaultValue = "")
+        {
+            var v = elem.GetAttribute(attribute);
+            if (string.IsNullOrEmpty(v))
+                v = defaultValue;
+            return v;
         }
     }
 }

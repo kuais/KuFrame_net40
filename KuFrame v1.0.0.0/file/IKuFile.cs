@@ -1,6 +1,6 @@
 ﻿namespace Ku.file
 {
-    interface IKuFile
+    internal interface IKuFile
     {
         void Load(string path);
         void Save(string path = "");

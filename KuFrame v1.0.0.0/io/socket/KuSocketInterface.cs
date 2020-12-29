@@ -1,6 +1,4 @@
-﻿using System.Net.Sockets;
-
-namespace Ku.io.socket
+﻿namespace Ku.io.socket
 {
     public interface ISocketListener : IError
     {

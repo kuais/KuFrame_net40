@@ -23,7 +23,7 @@ namespace Ku
             Write(content, path);
         }
 
-        private ReaderWriterLockSlim _rw = new ReaderWriterLockSlim();
+        private readonly ReaderWriterLockSlim _rw = new ReaderWriterLockSlim();
         private void Write(string content, string path)
         {
             try

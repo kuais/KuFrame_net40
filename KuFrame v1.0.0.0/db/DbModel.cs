@@ -5,7 +5,7 @@ namespace Ku.db
     public class DbModel : KuModel
     {
         protected string table;
-        public virtual string Table { get; set; }
+        public virtual string Table { get => table; set => table = value; }
 
         public virtual List<string> Create() { return null; }
         public virtual List<string> Upgrade() { return null; }

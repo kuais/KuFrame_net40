@@ -128,8 +128,8 @@ namespace Ku.io.socket
         {
             //if((RemoteEndPoint == null) || (Socket == null)) return;
             if (Socket == null) return;
-            Server?.RemoveConnection(this);
             base.DisConnected(e);
+            Server?.RemoveConnection(this);
             Server = null;
             AfterDisconnected?.Invoke();
         }

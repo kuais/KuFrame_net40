@@ -5,7 +5,7 @@ namespace Ku.crypto
 {
     public class KuMD5 : ICrypto
     {
-        private MD5CryptoServiceProvider provider = new MD5CryptoServiceProvider();
+        private readonly MD5CryptoServiceProvider provider = new MD5CryptoServiceProvider();
 
         public byte[] Decrypt(byte[] input)
         {

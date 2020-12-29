@@ -5,9 +5,9 @@ namespace Ku.util
 {
     public class KuFunction
     {
-        public static bool IsAscii(byte input)
+        public static bool IsAscii(byte p)
         {
-            return (0x20 <= input) && (input <= 0x7E);
+            return (0x20 <= p) && (p <= 0x7E);
         }
         /// <summary>
         /// 计算累加和
@@ -30,7 +30,7 @@ namespace Ku.util
             return (byte)GetSum(temp, 0, count);
         }
 
-        public static int GetBit(byte input, int pos, int count = 1)
+        public static int GetBit(byte b, int pos, int count = 1)
         {
             byte temp = 1;
             while (--count > 0)
@@ -38,9 +38,9 @@ namespace Ku.util
                 temp <<= 1;
                 temp += 1;
             }
-            return (input>>pos) & temp;
+            return (b >> pos) & temp;
         }
-        public static void SetBit(ref byte input, int pos, int value, int count = 1)
+        public static byte SetBit(ref byte b, int pos, int value, int count = 1)
         {
             byte temp = 1;
             while (--count > 0)
@@ -50,7 +50,8 @@ namespace Ku.util
             }
             temp <<= pos;
             value <<= pos;
-            input = (byte)((input & ~temp) | value);
+            b = (byte)((b & ~temp) | value);
+            return b;
         }
 
         /// <summary>
@@ -81,6 +82,21 @@ namespace Ku.util
         {
             if (o.InvokeRequired) o.Invoke(action, null);
             else action();
+        }
+
+        public static string PadLeft(string s, int count, char c)
+        {
+            return s.PadLeft(count, c);
+        }
+        public static string PadRight(string s, int count, char c)
+        {
+            return s.PadRight(count, c);
+        }
+        public static string Reverse(string input)
+        {
+            var arr = input.ToCharArray();
+            Array.Reverse(arr);
+            return new string(arr);
         }
     }
 }

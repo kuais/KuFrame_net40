@@ -5,10 +5,8 @@ namespace Ku
     public class KuBuffer
     {
         #region private
-        /* 当前指向位置 */
-        private int _curPosition;
-        /* 当前已保存数据数 */
-        private int _dataCount;
+        private int _curPosition;                                       /* 当前指向位置 */
+        private int _dataCount;                                         /* 当前已保存数据数 */
         #endregion
 
         #region public
@@ -37,9 +35,9 @@ namespace Ku
 
         public KuBuffer(int size = 1024)
         {
-            Buffers = new byte[size];
             _curPosition = 0;
             _dataCount = 0;
+            Buffers = new byte[size];
         }
         private void Resize(int size)
         {
@@ -80,6 +78,14 @@ namespace Ku
             return ret;
         }
         /// <summary>
+        /// 取出所有数据
+        /// </summary>
+        /// <returns>取出的数据</returns>
+        public byte[] GetAll()
+        {
+            return GetArray(DataCount);
+        }
+        /// <summary>
         /// 取出某一位置的值
         /// </summary>
         /// <param name="pos">要取出的位置</param>
@@ -116,11 +122,11 @@ namespace Ku
                     break;
                 while (true)
                 {
+                    if (i == (valueLen - 1))
+                        return offset;
                     i++;
                     if (Get(offset + i) != values[i])
                         break;
-                    if (i == (valueLen - 1))
-                        return offset;
                 }
                 offset++;
             }

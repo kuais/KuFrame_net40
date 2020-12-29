@@ -9,9 +9,9 @@ namespace Ku.io.socket
     public abstract class KuSocket : IDisposable
     {
         protected Socket socket;
-        private object lockO = new object();
-        private Stack<SocketAsyncEventArgs> stack_Recv = new Stack<SocketAsyncEventArgs>();
-        private Stack<SocketAsyncEventArgs> stack_Send = new Stack<SocketAsyncEventArgs>();
+        private readonly object lockO = new object();
+        private readonly Stack<SocketAsyncEventArgs> stack_Recv = new Stack<SocketAsyncEventArgs>();
+        private readonly Stack<SocketAsyncEventArgs> stack_Send = new Stack<SocketAsyncEventArgs>();
 
         #region Properties
         public Dictionary<string, KuSocket> DictConnection { get; } = new Dictionary<string, KuSocket>();
@@ -173,14 +173,11 @@ namespace Ku.io.socket
                 PushArgs(e, 0);
             else if (e.SocketError != SocketError.Success)
             {
-                PushArgs(e, 0);
                 Listener?.OnError(new KuSocketException(e));                //接收出错
                 this.Close();
             }
             else if (e.BytesTransferred == 0)
             {                                                               //收到空数据 = 断线
-                PushArgs(e, 0);
-                DisConnected(e);
                 this.Close();
             }
             else

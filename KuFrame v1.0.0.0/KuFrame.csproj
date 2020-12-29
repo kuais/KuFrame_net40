@@ -66,7 +66,6 @@
       <HintPath>..\packages\MySql.Data.6.9.12\lib\net40\MySql.Data.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.SQLite, Version=1.0.111.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
@@ -84,6 +83,7 @@
     <Compile Include="base\KuModel.cs" />
     <Compile Include="base\KuPair.cs" />
     <Compile Include="base\KuSafeHandle.cs" />
+    <Compile Include="base\KuTask.cs" />
     <Compile Include="base\KuThread.cs" />
     <Compile Include="crypto\KuRSA.cs" />
     <Compile Include="crypto\KuSHA.cs" />
@@ -101,6 +101,8 @@
     <Compile Include="file\IKuFile.cs" />
     <Compile Include="file\KuCSV.cs" />
     <Compile Include="file\KuCSV2.cs" />
+    <Compile Include="file\KuFile.cs" />
+    <Compile Include="io\http\KuHttp.cs" />
     <Compile Include="io\socket\KuSocket.cs" />
     <Compile Include="io\socket\KuUdp.cs" />
     <Compile Include="util\KuImage.cs" />
@@ -123,7 +125,6 @@
     <Compile Include="winapi\User32.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

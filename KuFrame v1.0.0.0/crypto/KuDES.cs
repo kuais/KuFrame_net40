@@ -5,12 +5,12 @@ namespace Ku.crypto
 {
     public class KuDES : ICrypto
     {
-        private DESCryptoServiceProvider provider = new DESCryptoServiceProvider();
+        private readonly DESCryptoServiceProvider provider = new DESCryptoServiceProvider();
 
         public byte[] Key { get; set; }
         public byte[] IV { get; set; }
         public CipherMode Mode { get; set; } = CipherMode.CBC;
-        public PaddingMode Padding { get; set; } = PaddingMode.Zeros;
+        public PaddingMode Padding { get; set; } = PaddingMode.PKCS7;
         
 
         public KuDES()

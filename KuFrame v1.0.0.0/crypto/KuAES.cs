@@ -5,7 +5,7 @@ namespace Ku.crypto
 {
     public class KuAES : ICrypto
     {
-        private AesCryptoServiceProvider provider = new AesCryptoServiceProvider();
+        private readonly AesCryptoServiceProvider provider = new AesCryptoServiceProvider();
 
         public byte[] Key { get; set; }
         public byte[] IV { get; set; }

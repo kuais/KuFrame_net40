@@ -9,9 +9,9 @@ namespace Ku.util
     public class KuDll
     {
         #region 声明动态载入DLL的参数
-        Assembly _assembly;
-        object _object;                                  //要调用的类的实例
-        Type _type;                                   //要调用的类的类型
+        private Assembly _assembly;
+        private object _object;                                  //要调用的类的实例
+        private Type _type;                                   //要调用的类的类型
         #endregion
 
         #region 属性

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 //using System.Dynamic;
-using System.Reflection;
 
 namespace Ku
 {
@@ -10,24 +9,23 @@ namespace Ku
         {
             foreach (var key in m.Keys) this[key] = m[key];
         }
+        public void FromObject(object t)
+        {
+            var properties = t.GetType().GetProperties();
+            foreach (var p in properties)
+                this[p.Name] = p.GetValue(t, null);
+        }
         public T ToObject<T>() where T : new()
         {
             T t = new T();
-            PropertyInfo[] properties = typeof(T).GetProperties();
-            foreach (PropertyInfo p in properties)
+            var properties = t.GetType().GetProperties();
+            foreach (var p in properties)
             {
                 this.ContainsKey(p.Name);
                 p.SetValue(t, this[p.Name], null);
             }
             return t;
         }
-        public void FromObject<T>(T t)
-        {
-            PropertyInfo[] properties = typeof(T).GetProperties();
-            foreach (PropertyInfo p in properties)
-                this[p.Name] = p.GetValue(t, null);
-        }
-
         //public dynamic ToDynamic()
         //{
         //    dynamic result = new ExpandoObject();
@@ -35,6 +33,5 @@ namespace Ku
         //        ((ICollection<KeyValuePair<string, object>>)result).Add(new KeyValuePair<string, object>(entry.Key, entry.Value));
         //    return result;
         //}
-
     }
 }

@@ -6,9 +6,11 @@ namespace Ku
 {
     public class KuThread
     {
-        public IProgress Listener;
         public bool IsStop { get; private set; } = true;
         public bool IsLoop { get; private set; } = false;
+        public bool IsPause { get; private set; } = false;
+
+        public IProgress Listener;
 
         public KuThread() { }
         public static void Invoke(ISynchronizeInvoke o, Action action)
@@ -18,7 +20,7 @@ namespace Ku
             else
                 action();
         }
-        public void Run(Action action, int delay = 0)
+        public KuThread Run(Action action, int delay = 0)
         {
             new Thread(() =>
             {
@@ -28,14 +30,15 @@ namespace Ku
                     Thread.Sleep(delay);
                     action?.Invoke();
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     Listener?.OnError(ex);
                 }
                 OnStop();
             }).Start();
+            return this;
         }
-        public void Loop(Action action, int interval = 0)
+        public KuThread Loop(Action action, int interval = 0)
         {
             IsLoop = true;
             new Thread(() =>
@@ -46,6 +49,7 @@ namespace Ku
                     while (IsLoop)
                     {
                         Thread.Sleep(interval);
+                        if (IsPause) continue;
                         action?.Invoke();
                     }
                 }
@@ -56,7 +60,10 @@ namespace Ku
                 }
                 OnStop();
             }).Start();
+            return this;
         }
+
+        public void Pause(bool flag) { IsPause = flag; }
         public void StopLoop() { IsLoop = false; }
         public void WaitStop()
         {
@@ -77,12 +84,12 @@ namespace Ku
         private void OnStart()
         {
             IsStop = false;
-            Listener?.onStart();
+            Listener?.OnStart();
         }
         private void OnStop()
         {
             IsStop = true;
-            Listener?.onStop();
+            Listener?.OnStop();
         }
     }
 }
