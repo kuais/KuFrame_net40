@@ -21,14 +21,12 @@ namespace Ku.file
             Path = path;
             datas = new List<KuModel>();
             var line = "";
-            using (StreamReader sr = new StreamReader(Path, Encoding))
+            using (var sr = new StreamReader(Path, Encoding))
             {
                 while ((line = sr.ReadLine()) != null)
                 {
-                    line = line.Trim();
+                    line = line.Trim().Replace("\t", "").Replace("\"", "");
                     if (string.IsNullOrEmpty(line)) continue;
-                    line = line.Replace("\t", "");
-                    line = line.Replace("\"", "");
                     var arr = Regex.Split(line, ",", RegexOptions.None);
                     var m = new KuModel();
                     for(int i = 0; i < arr.Length; i++)
@@ -44,15 +42,14 @@ namespace Ku.file
         public void Save(string path = "")
         {
             if (string.IsNullOrEmpty(path)) path = Path;
-            using (StreamWriter sw = new StreamWriter(path, false, Encoding))
+            using (var sw = new StreamWriter(path, false, Encoding))
             {
-                foreach (KuModel m in datas)
+                var arr = new string[fields.Count];
+                foreach (var m in datas)
                 {
-                    var arr = new string[fields.Count];
                     for (int i = 0; i < fields.Count; i++)
                         arr[i] = $"\"{m[fields[i]]}\"";
-                    string temp = string.Join(",", arr);
-                    sw.WriteLine(temp);
+                    sw.WriteLine(string.Join(",", arr));
                 }
             }
         }

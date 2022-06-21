@@ -1,10 +1,16 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace Ku.util
 {
     public class KuFunction
     {
+        /// <summary>
+        /// Check if p is ascii
+        /// </summary>
+        /// <param name="p">The data need to be check</param>
+        /// <returns>True:yes, False: no</returns>
         public static bool IsAscii(byte p)
         {
             return (0x20 <= p) && (p <= 0x7E);
@@ -13,23 +19,42 @@ namespace Ku.util
         /// 计算累加和
         /// </summary>
         /// <param name="input">要计算的数据</param>
-        /// <param name="index">起始位置</param>
+        /// <param name="offset">起始位置</param>
         /// <param name="count">要计算的数据数</param>
         /// <returns></returns>
-        public static int GetSum(int[] input, int index, int count)
+        public static int GetSum(int[] input, int offset, int count)
         {
             int sum = 0;
             while (count-- > 0)
-                sum += input[index++];
+            {
+                if ((offset % 2048) == 0)
+                    Debug.WriteLine($"Chksum: {sum}");
+                sum += input[offset++];
+            }
+            Debug.WriteLine($"Chksum: {sum}");
             return sum;
         }
-        public static byte GetSum(byte[] input, int index, int count)
+        /// <summary>
+        /// Get CheckSum(byte)
+        /// </summary>
+        /// <param name="input">Datas to calculate</param>
+        /// <param name="offset">Offset</param>
+        /// <param name="count">Count</param>
+        /// <returns>Sum</returns>
+        public static byte GetSum(byte[] input, int offset, int count)
         {
             int[] temp = new int[count];
-            Array.Copy(input, index, temp, 0, count);
+            Array.Copy(input, offset, temp, 0, count);
             return (byte)GetSum(temp, 0, count);
         }
 
+        /// <summary>
+        /// Get value of bits
+        /// </summary>
+        /// <param name="b">A byte</param>
+        /// <param name="pos">the bit position, 0 - 7</param>
+        /// <param name="count">The count of bits, 1 - 8</param>
+        /// <returns>value</returns>
         public static int GetBit(byte b, int pos, int count = 1)
         {
             byte temp = 1;
@@ -40,6 +65,15 @@ namespace Ku.util
             }
             return (b >> pos) & temp;
         }
+
+        /// <summary>
+        /// Set value of bits
+        /// </summary>
+        /// <param name="b">A byte</param>
+        /// <param name="pos">the bit position, 0 - 7</param>
+        /// <param name="value">The value to be set</param>
+        /// <param name="count">The count of bits, 1 - 8</param>
+        /// <returns>new value</returns>
         public static byte SetBit(ref byte b, int pos, int value, int count = 1)
         {
             byte temp = 1;
@@ -55,11 +89,11 @@ namespace Ku.util
         }
 
         /// <summary>
-        /// 获取当前年龄
+        /// Get Age
         /// </summary>
-        /// <param name="birth">出生日期</param>
-        /// <param name="now">当前时间</param>
-        /// <returns>年龄</returns>
+        /// <param name="birth">birth day</param>
+        /// <param name="now">Time of now</param>
+        /// <returns>Age</returns>
         public static int GetAge(DateTime birth, DateTime now)
         {
             int result;
@@ -70,19 +104,12 @@ namespace Ku.util
             return result;
         }
 
-        public static string GetError(Exception ex) => string.IsNullOrEmpty(ex.Message) ? ex.ToString() : ex.Message;
-
         /// <summary>
-        /// 执行操作,兼容多线程
+        /// Get error description
         /// </summary>
-        /// <param name="o"></param>
-        /// <param name="action"></param>
-        /// <param name="args"></param>
-        public static void Invoke(ISynchronizeInvoke o, Action action)
-        {
-            if (o.InvokeRequired) o.Invoke(action, null);
-            else action();
-        }
+        /// <param name="ex">error</param>
+        /// <returns>description</returns>
+        public static string GetError(Exception ex) => string.IsNullOrEmpty(ex.Message) ? ex.ToString() : ex.Message;
 
         public static string PadLeft(string s, int count, char c)
         {

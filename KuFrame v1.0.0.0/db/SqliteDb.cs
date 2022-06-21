@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
 using System.Data.SQLite;
 using System.Threading;
@@ -27,11 +28,23 @@ namespace Ku.db
             try
             {
                 lock0.EnterWriteLock();
-                base.DoAction(action);
+                Open();
+                action();
             }
             finally
             {
                 lock0.ExitWriteLock();
+            }
+        }
+        public override void Open()
+        {
+            if (_conn == null)
+                _conn = InitConnection();
+            if (_conn.State != ConnectionState.Open)
+            {
+                _conn.Open();
+                _cmd = _conn.CreateCommand();
+                _cmd.CommandTimeout = TimeOut;
             }
         }
     }

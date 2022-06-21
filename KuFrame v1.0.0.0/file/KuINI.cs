@@ -20,7 +20,7 @@ namespace Ku.file
             var line = "";
             var currentSection = "";
             var dictItems = new Dictionary<string, string>();
-            using (StreamReader sr = new StreamReader(Path, Encoding))
+            using (var sr = new StreamReader(Path, Encoding))
             {
                 while ((line = sr.ReadLine()) != null)
                 {
@@ -59,7 +59,7 @@ namespace Ku.file
         public void Save(string path = "")
         {
             if (string.IsNullOrEmpty(path)) path = Path;
-            using (StreamWriter sw = new StreamWriter(path, false, Encoding))
+            using (var sw = new StreamWriter(path, false, Encoding))
             {
                 foreach (string k1 in Dict.Keys)
                 {

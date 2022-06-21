@@ -1,3 +1,4 @@
+using Ku.file;
 using System;
 using System.IO;
 using System.Threading;
@@ -29,9 +30,8 @@ namespace Ku
             try
             {
                 _rw.EnterWriteLock();
-                content = string.Format("[{0}]\r\n{1}\r\n"
-                    , DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"), content);
-                File.AppendAllText(path, content);
+                content = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}]\r\n{content}\r\n";
+                KuFile.Append(path, content);
             }
             finally 
             {

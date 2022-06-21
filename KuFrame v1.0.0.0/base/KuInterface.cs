@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 namespace Ku
 {
+    public delegate void LogDelegate(string text);
+
     public interface IError { void OnError(Exception ex); }
     public interface IEventTrigger{ void Trigger(string name, params object[] args); }
     public interface ILog { void AddLog(object text); }

@@ -34,17 +34,31 @@ namespace Ku.file
         {
             Doc.AppendChild(Doc.CreateXmlDeclaration("1.0", "UTF-8", null));
         }
+        public void LoadXml(string xml)
+        {
+            Doc = new XmlDocument();
+            Doc.LoadXml(xml);
+        }
+        ///// <summary>
+        ///// 获取指定名称的第一个节点
+        ///// </summary>
+        ///// <param name="name"></param>
+        ///// <returns></returns>
+        //public XmlElement GetElement(string name = "", bool find = false)
+        //{
+        //    return GetElement(name, null, find);
+        //}
         /// <summary>
         /// 获取指定名称的第一个子节点
         /// </summary>
         /// <param name="name">节点名称</param>
         /// <param name="parent">父节点</param>
         /// <returns></returns>
-        public XmlElement GetElement(string name, XmlElement parent = null, bool find = false)
+        public XmlElement GetElement(string name, XmlNode parent = null, bool find = false)
         {
             if (parent == null) 
                 parent = Doc.DocumentElement;
-            if (string.IsNullOrEmpty(name)) return parent;
+            if (string.IsNullOrEmpty(name)) return (XmlElement)parent;
             if (find)
             {
                 XmlNodeList list = parent.SelectNodes(name);
@@ -57,7 +71,7 @@ namespace Ku.file
                 {
                     if (e.Name.Equals(name) && (e.NodeType == XmlNodeType.Element))
                         return (XmlElement)e;
-                } 
+                }
             }
             return null;
         }
@@ -81,14 +95,21 @@ namespace Ku.file
             }
             return result;
         }
-        public XmlElement AddElement(string name, XmlElement parent = null)
+        public XmlElement AddElement(string name, XmlNode parent = null)
         {
             var elemRoot = Doc.CreateElement(name);
             if (parent == null)
                 parent = Doc.DocumentElement;
-            var elem = GetElement(name, parent);
-            if (elem != null)
-                return elem;
+            if (parent == null)
+            {
+                parent = Doc;
+            }
+            else
+            {
+                var elem = GetElement(name, parent);
+                if (elem != null)
+                    return elem;
+            }
             return parent.AppendChild(elemRoot) as XmlElement;
         }
 

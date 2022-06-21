@@ -93,12 +93,12 @@ namespace Ku.io.socket
             //if ((RemoteEndPoint == null) || (Socket == null)) return;
             if (Socket == null) 
                 return;
-            Listener?.OnDisconnected(this);
             lock (((ICollection)DictConnection).SyncRoot)
             {
                 DictConnection.Remove(RemoteEndPoint.ToString());
                 //this.RemoteEndPoint = null;
             }
+            Listener?.OnDisconnected(this);
         }
         protected virtual void Received(SocketAsyncEventArgs e)
         {
@@ -157,7 +157,9 @@ namespace Ku.io.socket
                 Listener?.OnError(new KuSocketException(e));
             }
             else
+            {
                 Connected(e);                                     //连接成功
+            }
         }
         protected void ProcessDisConnected(SocketAsyncEventArgs e)
         {
@@ -170,7 +172,9 @@ namespace Ku.io.socket
         protected void ProcessReceive(SocketAsyncEventArgs e)
         {
             if (Socket == null)
+            {
                 PushArgs(e, 0);
+            }
             else if (e.SocketError != SocketError.Success)
             {
                 Listener?.OnError(new KuSocketException(e));                //接收出错
@@ -201,7 +205,9 @@ namespace Ku.io.socket
             if (flag == 0)
             {
                 if (stack_Recv.Count > 0)
+                {
                     e = stack_Recv.Pop();
+                }
                 else
                 {
                     e = new SocketAsyncEventArgs();
@@ -210,7 +216,10 @@ namespace Ku.io.socket
                 }
             }
             else
+            {
                 e = (stack_Send.Count > 0) ? stack_Send.Pop() : new SocketAsyncEventArgs();
+            }
+
             e.Completed += SocketEvent_Completed;
             return e;
         }

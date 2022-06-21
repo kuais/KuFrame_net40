@@ -240,7 +240,9 @@ namespace Ku.db
         {
             Builder.From(param.From).Filter(param.Filter);
             if (param.Page == 0 || param.PageSize == 0)
+            {
                 return Query(Builder.Order(param.Order).Select(param.Select));
+            }
             else
             {
                 //total

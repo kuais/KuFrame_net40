@@ -5,6 +5,17 @@ namespace Ku.util
 {
     public class KuConvert
     {
+        public static byte HexToByte(char c)
+        {
+            if (c >= 0x30 && c <= 0x39)
+                return (byte)(c - 0x30);
+            if (c >= 0x61 && c <= 0x66)
+                c = (char)(c - 0x20);
+            if (c >= 0x41 && c <= 0x44)
+                return (byte)(c - 0x41 + 10);
+            return (byte)c;
+        }
+
         /// <summary>
         /// byte转2进制字符串
         /// </summary>

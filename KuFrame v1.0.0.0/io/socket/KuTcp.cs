@@ -41,7 +41,7 @@ namespace Ku.io.socket
         }
         public void Disconnect(bool reuse = false)
         {
-            if (!IsConnected) return;
+            if (socket == null) return;
             //if (!socket.Connected) return;
             try
             {
@@ -105,6 +105,8 @@ namespace Ku.io.socket
             catch (Exception ex)
             {
                 Listener?.OnError(ex);
+                if (socket == null)
+                    DisConnected(null);
             }
         }
         internal void Connected(Socket socket)
@@ -128,8 +130,8 @@ namespace Ku.io.socket
         {
             //if((RemoteEndPoint == null) || (Socket == null)) return;
             if (Socket == null) return;
-            base.DisConnected(e);
             Server?.RemoveConnection(this);
+            base.DisConnected(e);
             Server = null;
             AfterDisconnected?.Invoke();
         }

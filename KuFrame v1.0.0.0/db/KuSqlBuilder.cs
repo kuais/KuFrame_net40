@@ -100,7 +100,6 @@ namespace Ku.db
         /// <returns>格式化后的字符串</returns>
         public static string Raw(object input)
         {
-            
             if (input is null) return "NULL";
             if (input is string) return $"'{input}'";
             if (input is DateTime) return $"'{(DateTime)input:yyyy-MM-dd HH:mm:ss}'";
@@ -114,7 +113,8 @@ namespace Ku.db
         /// <returns></returns>
         public static string Fix(string sql)
         {
-            return sql.Replace("'", "''");
+            sql = sql.Replace("'", "''");
+            return sql;
         }
 
     }

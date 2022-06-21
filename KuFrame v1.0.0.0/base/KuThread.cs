@@ -13,6 +13,12 @@ namespace Ku
         public IProgress Listener;
 
         public KuThread() { }
+
+        /// <summary>
+        /// Run execution in UI thread
+        /// </summary>
+        /// <param name="o">Invoke object</param>
+        /// <param name="action">action need to do</param>
         public static void Invoke(ISynchronizeInvoke o, Action action)
         {
             if (o.InvokeRequired)
@@ -20,6 +26,13 @@ namespace Ku
             else
                 action();
         }
+
+        /// <summary>
+        /// Run execution once in new Thread
+        /// </summary>
+        /// <param name="action">action will do</param>
+        /// <param name="delay">will run after deley[ms]</param>
+        /// <returns></returns>
         public KuThread Run(Action action, int delay = 0)
         {
             new Thread(() =>
@@ -38,6 +51,12 @@ namespace Ku
             }).Start();
             return this;
         }
+        /// <summary>
+        /// Loop execution in new Thread
+        /// </summary>
+        /// <param name="action">action will do</param>
+        /// <param name="interval">The interval[ms] between two actions</param>
+        /// <returns></returns>
         public KuThread Loop(Action action, int interval = 0)
         {
             IsLoop = true;

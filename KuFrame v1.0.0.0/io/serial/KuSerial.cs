@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.IO.Ports;
 
 namespace Ku.io.serial
@@ -10,8 +11,8 @@ namespace Ku.io.serial
         protected long _timeoutActived = 5000;
         protected Exception _lastError;
 
-        private SerialPort _sp;
-        private readonly KuThread _rRead = new KuThread();
+        protected SerialPort _sp;
+        protected readonly KuThread _rRead = new KuThread();
         private IProtocol _protocol;
 
         #region 属性
@@ -25,7 +26,8 @@ namespace Ku.io.serial
         public void Protocol(IProtocol protocol) { _protocol = protocol; }
         #endregion
 
-        public void Open()
+        public string[] PortNames => SerialPort.GetPortNames();
+        public virtual void Open()
         {
             Close();
             _sp = new SerialPort(Port, Baudrate, 0);
@@ -33,24 +35,24 @@ namespace Ku.io.serial
             _rRead.Loop(TaskRead, 100);
             IsOpened = true;
         }
-        public void Open(string port)
+        public virtual void Open(string port)
         {
             Port = port;
             Open();
         }
-        public void Open(string port, int baudrate)
+        public virtual void Open(string port, int baudrate)
         {
             Baudrate = baudrate;
             Open(port);
         }
-        public void Close()
+        public virtual void Close()
         {
-            _rRead.WaitStop();
+            _rRead.StopLoop();
             if (_sp != null) _sp.Close();
             _sp = null;
             IsOpened = false;
         }
-        public void Write(byte[] data)
+        public virtual void Write(byte[] data)
         {
             _sp.Write(data, 0, data.Length);
             //_timeActived = DateTime.Now.Ticks;
@@ -77,7 +79,7 @@ namespace Ku.io.serial
             _lastError = ex;
             if (SerialListener != null) SerialListener.OnError(ex);
         }
-        protected void HandleRecv(byte[] datas) { }
+        protected virtual void HandleRecv(byte[] datas) { }
         private void TaskRead()
         {
             try

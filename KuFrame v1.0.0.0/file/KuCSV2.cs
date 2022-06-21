@@ -19,16 +19,14 @@ namespace Ku.file
         {
             Path = path;
             Dict = new Dictionary<string, string>();
-            string line = "";
-            using (StreamReader sr = new StreamReader(Path, Encoding))
+            var line = "";
+            using (var sr = new StreamReader(Path, Encoding))
             {
                 while ((line = sr.ReadLine()) != null)
                 {
-                    line = line.Trim();
+                    line = line.Trim().Replace("\t", "").Replace("\"", "");
                     if (string.IsNullOrEmpty(line)) continue;
-                    line = line.Replace("\t", "");
-                    line = line.Replace("\"", "");
-                    string[] arr = Regex.Split(line, ",", RegexOptions.None);
+                    var arr = Regex.Split(line, ",", RegexOptions.None);
                     Dict[arr[0]] = arr[1];
                 }
             }
@@ -36,13 +34,10 @@ namespace Ku.file
         public void Save(string path = "")
         {
             if (string.IsNullOrEmpty(path)) path = Path;
-            using (StreamWriter sw = new StreamWriter(path, false, Encoding))
+            using (var sw = new StreamWriter(path, false, Encoding))
             {
-                foreach (string k1 in Dict.Keys)
-                {
-                    string temp = string.Format("\"{0}\",\"{1}\"", k1, Dict[k1]);
-                    sw.WriteLine(temp);
-                }
+                foreach (var k1 in Dict.Keys)
+                    sw.WriteLine($"\"{k1}\",\"{Dict[k1]}\"");
             }
         }
     }
