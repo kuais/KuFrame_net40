@@ -7,7 +7,7 @@ namespace Ku.io.socket
     public class KuTcp : KuSocket
     {
         #region Properties
-        public bool IsConnected => (socket !=null && socket.Connected);
+        public bool IsConnected => (socket != null && socket.Connected);
         public KuTcpServer Server { get; set; }
         public Action AfterDisconnected { get; set; }
         #endregion

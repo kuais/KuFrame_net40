@@ -5,46 +5,37 @@ namespace Ku.crypto
 {
     public class KuRSA : ICrypto
     {
-        public RSACryptoServiceProvider provider = new RSACryptoServiceProvider();
+        private readonly RSA _cryptor = RSA.Create();
         public bool UseOAEP { get; set; } = false;
 
-        public KuRSA(string key)
-        {
-            provider.FromXmlString(key);
-        }
+        public KuRSA() { }
+        public KuRSA(string key) { _cryptor.FromXmlString(key);}
 
-        public static RSAKey GenerateKeys()
-        {
-            RSACryptoServiceProvider provider = new RSACryptoServiceProvider();
-            RSAKey key = new RSAKey();
-            key.PrivateKey = provider.ToXmlString(false);
-            key.PublicKey = provider.ToXmlString(true);
-            return key;
-        }
-
-        public byte[] Decrypt(byte[] input)
-        {
-            return provider.Decrypt(input, UseOAEP);
-        }
-
-        public byte[] Encrypt(byte[] input)
-        {
-            return provider.Encrypt(input, UseOAEP);
-        }
+        public byte[] Decrypt(byte[] input) => _cryptor.DecryptValue(input);
+        public byte[] Encrypt(byte[] input) => _cryptor.EncryptValue(input);
+        public void Dispose() => _cryptor.Dispose();
 
         public string Sign(byte[] input,string algorithm)
         {
-            RSAPKCS1SignatureFormatter rf = new RSAPKCS1SignatureFormatter(provider);
+            var rf = new RSAPKCS1SignatureFormatter(_cryptor);
             rf.SetHashAlgorithm(algorithm);
             byte[] output = rf.CreateSignature(input);
             return Convert.ToBase64String(output);
         }
-
         public bool Verify(byte[] input, string signature, string algorithm)
         {
-            RSAPKCS1SignatureDeformatter rf = new RSAPKCS1SignatureDeformatter(provider);
+            RSAPKCS1SignatureDeformatter rf = new RSAPKCS1SignatureDeformatter(_cryptor);
             rf.SetHashAlgorithm(algorithm);
             return rf.VerifySignature(input, Convert.FromBase64String(signature));
+        }
+
+        public static RSAKey GenerateKeys()
+        {
+            RSA cryptor = RSA.Create();
+            RSAKey key = new RSAKey();
+            key.PrivateKey = cryptor.ToXmlString(false);
+            key.PublicKey = cryptor.ToXmlString(true);
+            return key;
         }
 
         public class RSAKey

@@ -56,7 +56,7 @@ namespace Ku.file
         /// <returns></returns>
         public XmlElement GetElement(string name, XmlNode parent = null, bool find = false)
         {
-            if (parent == null) 
+            if (parent == null)
                 parent = Doc.DocumentElement;
             if (string.IsNullOrEmpty(name)) return (XmlElement)parent;
             if (find)

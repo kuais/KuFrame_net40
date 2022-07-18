@@ -312,7 +312,7 @@ namespace Ku.db
         public string Order { get; set; }
         public int Page { get; set; } = 0;
         public int PageSize { get; set; } = 0;
- 
+
         public QueryParam()
         {
         }

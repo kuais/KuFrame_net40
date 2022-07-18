@@ -5,25 +5,15 @@ namespace Ku.crypto
 {
     public class KuMD5 : ICrypto
     {
-        private readonly MD5CryptoServiceProvider provider = new MD5CryptoServiceProvider();
-
-        public byte[] Decrypt(byte[] input)
-        {
-            return input;
-        }
-
-        public byte[] Encrypt(byte[] input)
-        {
-            return provider.ComputeHash(input);
-        }
-        public byte[] Encrypt(Stream input)
-        {
-            return provider.ComputeHash(input);
-        }
+        private readonly MD5 _cryptor = MD5.Create();
+        public byte[] Decrypt(byte[] input) => input;
+        public byte[] Encrypt(byte[] input) => _cryptor.ComputeHash(input);
+        public byte[] Encrypt(Stream input) => _cryptor.ComputeHash(input);
+        public void Dispose() => _cryptor.Dispose();
         public string FileMd5(Stream input)
         {
             var data = Encrypt(input);
-            return System.BitConverter.ToString(data).Replace("-","");
+            return System.BitConverter.ToString(data).Replace("-", "");
         }
     }
 }

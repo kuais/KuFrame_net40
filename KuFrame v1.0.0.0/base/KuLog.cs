@@ -25,7 +25,7 @@ namespace Ku
         }
 
         private readonly ReaderWriterLockSlim _rw = new ReaderWriterLockSlim();
-        private void Write(string content, string path)
+        public void Write(string content, string path)
         {
             try
             {
@@ -33,7 +33,7 @@ namespace Ku
                 content = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}]\r\n{content}\r\n";
                 KuFile.Append(path, content);
             }
-            finally 
+            finally
             {
                 _rw.ExitWriteLock();
             }

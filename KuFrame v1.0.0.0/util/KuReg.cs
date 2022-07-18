@@ -22,7 +22,6 @@ namespace Ku.util
         /// <returns></returns>
         public static object Load(RegistryKey Root, string RegAddress, string KeyName, object DefaultValue)
         {
-            object Value = DefaultValue;
             string[] strAddress = RegAddress.Split('\\');
             int lenth = strAddress.Length;
             RegistryKey[] Key = new RegistryKey[lenth + 1];
@@ -31,7 +30,7 @@ namespace Ku.util
             {
                 Key[i + 1] = Key[i].CreateSubKey(strAddress[i]);
             }
-            Value = Key[lenth].GetValue(KeyName);
+            object Value = Key[lenth].GetValue(KeyName);
             Key[lenth].Close();
             return Value;
         }

@@ -5,7 +5,7 @@ namespace Ku.crypto
 {
     public class KuAES : ICrypto
     {
-        private readonly AesCryptoServiceProvider provider = new AesCryptoServiceProvider();
+        private readonly Aes _cryptor = Aes.Create();
 
         public byte[] Key { get; set; }
         public byte[] IV { get; set; }
@@ -14,10 +14,8 @@ namespace Ku.crypto
 
         public KuAES()
         {
-            provider.GenerateKey();
-            provider.GenerateIV();
-            this.Key = provider.Key;
-            this.IV = provider.IV;
+            Key = _cryptor.Key;
+            IV = _cryptor.IV;
         }
         public KuAES(byte[] key, byte[] iv)
         {
@@ -26,11 +24,11 @@ namespace Ku.crypto
         }
         public byte[] Decrypt(byte[] input)
         {
-            provider.Mode = Mode;
-            provider.Padding = Padding;
+            _cryptor.Mode = Mode;
+            _cryptor.Padding = Padding;
             using (MemoryStream mStream = new MemoryStream())
             {
-                CryptoStream cStream = new CryptoStream(mStream, provider.CreateDecryptor(Key, IV), CryptoStreamMode.Write);
+                CryptoStream cStream = new CryptoStream(mStream, _cryptor.CreateEncryptor(Key, IV), CryptoStreamMode.Write);
                 cStream.Write(input, 0, input.Length);
                 cStream.FlushFinalBlock();
                 return mStream.ToArray();
@@ -39,15 +37,17 @@ namespace Ku.crypto
 
         public byte[] Encrypt(byte[] input)
         {
-            provider.Mode = Mode;
-            provider.Padding = Padding;
+            _cryptor.Mode = Mode;
+            _cryptor.Padding = Padding;
             using (MemoryStream mStream = new MemoryStream())
             {
-                CryptoStream cStream = new CryptoStream(mStream, provider.CreateEncryptor(Key, IV), CryptoStreamMode.Write);
+                CryptoStream cStream = new CryptoStream(mStream, _cryptor.CreateEncryptor(Key, IV), CryptoStreamMode.Write);
                 cStream.Write(input, 0, input.Length);
                 cStream.FlushFinalBlock();
                 return mStream.ToArray();
             }
         }
+
+        public void Dispose() => _cryptor.Dispose();
     }
 }

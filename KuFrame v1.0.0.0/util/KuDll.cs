@@ -20,7 +20,7 @@ namespace Ku.util
         public object CurrentInstance { get => _object; }
         #endregion
 
-        public KuDll(){}
+        public KuDll() { }
 
         /// <summary>
         /// 加载dll文件

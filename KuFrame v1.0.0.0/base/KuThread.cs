@@ -9,10 +9,16 @@ namespace Ku
         public bool IsStop { get; private set; } = true;
         public bool IsLoop { get; private set; } = false;
         public bool IsPause { get; private set; } = false;
-
+        public bool IsStopping { get; private set; } = false;
         public IProgress Listener;
 
-        public KuThread() { }
+        private static long _sid = 0;
+        private long id;
+        public KuThread()
+        {
+            id = _sid;
+            _sid++;
+        }
 
         /// <summary>
         /// Run execution in UI thread
@@ -59,6 +65,7 @@ namespace Ku
         /// <returns></returns>
         public KuThread Loop(Action action, int interval = 0)
         {
+            if (IsStopping) return this;
             IsLoop = true;
             new Thread(() =>
             {
@@ -86,6 +93,7 @@ namespace Ku
         public void StopLoop() { IsLoop = false; }
         public void WaitStop()
         {
+            IsStopping = true;
             StopLoop();
             while (!IsStop)
             {
@@ -98,6 +106,7 @@ namespace Ku
                     Listener?.OnError(ex);
                 }
             }
+            IsStopping = false;
         }
 
         private void OnStart()

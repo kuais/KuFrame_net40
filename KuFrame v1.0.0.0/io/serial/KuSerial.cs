@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.IO.Ports;
 
 namespace Ku.io.serial
@@ -13,7 +12,6 @@ namespace Ku.io.serial
 
         protected SerialPort _sp;
         protected readonly KuThread _rRead = new KuThread();
-        private IProtocol _protocol;
 
         #region 属性
         public int Baudrate { get; set; } = 9600;
@@ -23,13 +21,13 @@ namespace Ku.io.serial
         public Exception LastError => _lastError;
         public KuBuffer Buffer { get; protected set; } = new KuBuffer();
         public ISerialListener SerialListener { get; set; }
-        public void Protocol(IProtocol protocol) { _protocol = protocol; }
         #endregion
 
         public string[] PortNames => SerialPort.GetPortNames();
         public virtual void Open()
         {
             Close();
+            Buffer.Clear();
             _sp = new SerialPort(Port, Baudrate, 0);
             _sp.Open();
             _rRead.Loop(TaskRead, 100);
@@ -61,14 +59,6 @@ namespace Ku.io.serial
         protected virtual void OnRead(byte[] data)
         {
             if (SerialListener != null) SerialListener.OnRead(data);
-            if (_protocol == null) return;
-            byte[] datas;
-            while (true)
-            {
-                datas = _protocol.Decode(Buffer);
-                if (datas == null) return;
-                HandleRecv(datas);
-            }
         }
         protected virtual void OnWrote(byte[] datas)
         {
@@ -79,7 +69,6 @@ namespace Ku.io.serial
             _lastError = ex;
             if (SerialListener != null) SerialListener.OnError(ex);
         }
-        protected virtual void HandleRecv(byte[] datas) { }
         private void TaskRead()
         {
             try

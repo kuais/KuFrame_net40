@@ -29,7 +29,7 @@ namespace Ku.file
                     if (string.IsNullOrEmpty(line)) continue;
                     var arr = Regex.Split(line, ",", RegexOptions.None);
                     var m = new KuModel();
-                    for(int i = 0; i < arr.Length; i++)
+                    for (int i = 0; i < arr.Length; i++)
                     {
                         if (i >= fields.Count)
                             break;

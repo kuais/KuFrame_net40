@@ -91,7 +91,7 @@ namespace Ku.io.socket
         protected virtual void DisConnected(SocketAsyncEventArgs e)
         {
             //if ((RemoteEndPoint == null) || (Socket == null)) return;
-            if (Socket == null) 
+            if (Socket == null)
                 return;
             lock (((ICollection)DictConnection).SyncRoot)
             {

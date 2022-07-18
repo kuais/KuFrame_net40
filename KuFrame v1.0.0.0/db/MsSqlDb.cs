@@ -16,8 +16,8 @@ namespace Ku.db
 
     public class MsSqlBuilder : KuSqlBuilder
     {
-        public MsSqlBuilder() : base() {}
-        public MsSqlBuilder(string from) : base(from) {}
+        public MsSqlBuilder() : base() { }
+        public MsSqlBuilder(string from) : base(from) { }
 
         public string GetCurrentRowID(string table) => $"SELECT ident_current('{table}')";
 

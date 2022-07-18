@@ -25,7 +25,7 @@ namespace Ku
         /// <summary>
         /// 缓冲区大小
         /// </summary>
-        public int Size { get => Buffers.Length; set { Resize(value); } } 
+        public int Size { get => Buffers.Length; set { Resize(value); } }
         /// <summary>
         /// 单帧数据接收超时时间
         /// </summary>
@@ -118,7 +118,7 @@ namespace Ku
             {
                 i = 0;
                 offset = Find(values[i], offset);
-                if (offset < 0) 
+                if (offset < 0)
                     break;
                 while (true)
                 {

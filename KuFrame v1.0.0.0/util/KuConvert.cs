@@ -59,8 +59,7 @@ namespace Ku.util
         /// <returns></returns>
         public static string VG26ToDec(byte[] bytData)
         {
-            string strData = "";
-            string strTemp = "";
+            string strData, strTemp;
             strData = bytData[0].ToString();
             while (strData.Length < 3)
             {

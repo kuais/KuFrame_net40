@@ -1,6 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
-using System.Diagnostics;
 
 namespace Ku.util
 {
@@ -26,12 +24,7 @@ namespace Ku.util
         {
             int sum = 0;
             while (count-- > 0)
-            {
-                if ((offset % 2048) == 0)
-                    Debug.WriteLine($"Chksum: {sum}");
                 sum += input[offset++];
-            }
-            Debug.WriteLine($"Chksum: {sum}");
             return sum;
         }
         /// <summary>

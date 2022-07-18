@@ -16,8 +16,8 @@ namespace Ku.db
     }
     public class MySqlBuilder : KuSqlBuilder
     {
-        public MySqlBuilder() : base() {}
-        public MySqlBuilder(string from) : base(from) {}
+        public MySqlBuilder() : base() { }
+        public MySqlBuilder(string from) : base(from) { }
 
         protected override string ToField(string v) => $"`{v}`";
 

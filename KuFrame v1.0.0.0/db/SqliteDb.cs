@@ -51,8 +51,8 @@ namespace Ku.db
 
     public class SqliteBuilder : KuSqlBuilder
     {
-        public SqliteBuilder() : base() {}
-        public SqliteBuilder(string from) : base(from) {}
+        public SqliteBuilder() : base() { }
+        public SqliteBuilder(string from) : base(from) { }
 
         public string ListTableNames() => "SELECT name FROM sqlite_master WHERE TYPE='table'";
 
