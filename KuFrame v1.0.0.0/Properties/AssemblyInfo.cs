@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Kuais")]
 [assembly: AssemblyProduct("KuFrame")]
-[assembly: AssemblyCopyright("Copyright © Kuais 2018")]
+[assembly: AssemblyCopyright("Copyright © Kuais 2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
