@@ -1,9 +1,15 @@
 ﻿using System.Diagnostics;
+using System.Threading;
 
 namespace Ku.util
 {
     public class KuProcess
     {
+        public static bool IsRunning(string name)
+        {
+            new Mutex(true, name, out bool bCreateNew);
+            return !bCreateNew;
+        }
         public static Process Start(string path, bool hide = false)
         {
             var info = new ProcessStartInfo(path);
@@ -26,7 +32,6 @@ namespace Ku.util
                 p.Kill();
             }
         }
-
         public static Process[] Find(string name) => Process.GetProcessesByName(name);
         public static Process FindOne(string name) => Find(name)[0];
     }

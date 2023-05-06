@@ -102,6 +102,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="base\BaseProtocol.cs" />
     <Compile Include="base\KuBase.cs" />
     <Compile Include="base\KuBuffer.cs" />
     <Compile Include="base\KuInterface.cs" />
